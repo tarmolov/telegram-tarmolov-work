@@ -1,0 +1,22 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "esModuleInterop": true,
+        "types": ["node", "mocha"],
+        "sourceMap": true,
+        "incremental": true,
+        "tsBuildInfoFile": "./out/tsconfig.tsbuildinfo",
+        "target": "es2020",
+        "lib": ["es2020"],
+        "strict": true,
+        "noEmitOnError": true,
+        "rootDir": "src",
+        "outDir": "out",
+        "baseUrl": ".",
+        "resolveJsonModule": true
+    },
+    "include": [
+        "src/**/*"
+    ]
+}
