@@ -8,7 +8,7 @@ const TestPhotosFilenames = {
     train: path.resolve(__dirname, '../../../resources/train.png')
 };
 
-const bot = new TelegramProvider();
+const bot = new TelegramProvider({channelId: process.env.TELEGRAM_TESTING_CHANNEL_ID!});
 
 describe('providers/telegram', () => {
     describe('Text message', () => {

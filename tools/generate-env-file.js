@@ -2,7 +2,7 @@
 
 const fs = require('fs');
 const execSync = require('child_process').execSync;
-const secret = shell('yc lockbox secret get tarmolov-work_testing --format json');
+const secret = shell('yc lockbox secret get testing --format json');
 const version = shell(`yc lockbox payload get ${secret.current_version.secret_id} --format json`);
 const envFileContent = version.entries
     .map(({key, text_value}) => `${key}="${text_value}"`)

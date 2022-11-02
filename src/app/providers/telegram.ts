@@ -3,24 +3,31 @@ process.env['NTBA_FIX_350'] = '1';
 import * as fs from 'fs';
 import * as url from 'url';
 import * as TelegramBot from 'node-telegram-bot-api';
+import {config} from '../config';
 
 interface TelegramProviderResponse {
     type: string;
     url: string;
+    date: number; // timestamp
+}
+
+interface TelegramProviderOptions {
+    channelId: string;
 }
 
 export class TelegramProvider {
     private readonly _bot;
-    private readonly _channelId = process.env.TELEGRAM_CHANNEL_ID!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
+    private readonly _channelId;
     private readonly _defaultOptions: {parse_mode: TelegramBot.ParseMode} = {
         parse_mode: 'MarkdownV2'
     };
 
-    constructor() {
-        this._bot = new TelegramBot.default(process.env.TELEGRAM_BOT_TOKEN!); // eslint-disable-line @typescript-eslint/no-non-null-assertion
+    constructor(options: TelegramProviderOptions) {
+        this._channelId = options.channelId;
+        this._bot = new TelegramBot.default(config['telegram.botToken']);
     }
 
-    private _formatUrlToMessage(messageId: number) {
+    private _formatToMessageUrl(messageId: number) {
         return `https://t.me/c/${this._channelId.slice(4)}/${messageId}`
     }
 
@@ -29,13 +36,15 @@ export class TelegramProvider {
             await this._bot.editMessageText(text, {
                 chat_id: this._channelId,
                 message_id: messageId,
+                disable_web_page_preview: true,
                 ...this._defaultOptions
             }) :
-            await this._bot.sendMessage(this._channelId, text, this._defaultOptions);
+            await this._bot.sendMessage(this._channelId, text, {disable_web_page_preview: true, ...this._defaultOptions});
 
         return {
             type: 'text',
-            url: this._formatUrlToMessage((response as TelegramBot.Message).message_id)
+            url: this._formatToMessageUrl((response as TelegramBot.Message).message_id),
+            date: (response as TelegramBot.Message).date
         };
     }
 
@@ -69,30 +78,18 @@ export class TelegramProvider {
 
         return {
             type: 'photo',
-            url: this._formatUrlToMessage((response as TelegramBot.Message).message_id)
+            url: this._formatToMessageUrl((response as TelegramBot.Message).message_id),
+            date: (response as TelegramBot.Message).date
         }
     }
 
-    static getMessageIdFromUrl(telegramUrl: string): number | undefined {
+    static getMessageIdFromUrl(telegramUrl: string | undefined): number | undefined {
+        if (!telegramUrl) {
+            return undefined;
+        }
         const urlPath = url.parse(telegramUrl).pathname;
         if (urlPath) {
             return Number(urlPath.split('/').pop());
         }
     }
-
-    static TEXT_MESSAGE_FULL = `
-        *bold*
-        __underline__
-        ~strikethrough~
-        ||spoiler||
-        \`test\`
-        [inline URL](http://www.example.com/)
-        [inline mention of a user](tg://user?id=123456789)
-        \`inline fixed-width code\`
-        \`\`\`
-        pre-formatted fixed-width code block
-        \`\`\`
-    `;
-    static TEXT_MESSAGE_INITIAL = '*Initial message*';
-    static TEXT_MESSAGE_EDITED = '__Edited message__';
 }

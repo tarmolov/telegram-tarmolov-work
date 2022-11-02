@@ -16,6 +16,11 @@ Extra dependencies which are need for development issues:
   $ make env
   ```
 
+## Lint code
+```
+$ make validate
+```
+
 ## Run tests
 ```
 $ make test
@@ -28,7 +33,10 @@ $ make test
   $ make deploy-testing
   ```
 
-2. Invoke function
+2. Clear "testing" field in https://tracker.yandex.ru/BLOGTEST-2
+
+3. Invoke function
   ```
-  $ curl -s "https://functions.yandexcloud.net/d4e8rm8s3b2e0ng4sohd?text=test"
+  $ export $(cat .env | grep TELEGRAM_TESTING_CHANNEL_ID | xargs)
+  $ curl -v -X POST -H "Content-Type: application/json" -d '{"key": "BLOGTEST-2"}' "https://functions.yandexcloud.net/d4ecv7vnjs6o5502m7hn?channel_id=${TELEGRAM_TESTING_CHANNEL_ID}&publish_url_field=testing"
   ```

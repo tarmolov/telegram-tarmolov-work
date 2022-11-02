@@ -1,27 +1,31 @@
 import * as dotenv from 'dotenv'
 dotenv.config()
-import {TelegramProvider} from './providers/telegram'
+import {trackerWebhook} from './handlers/tracker-webhook';
+import {CloudFunctionRequest, CloudFunctionResponse} from './types';
 
-const bot = new TelegramProvider();
+exports.handler = async function (event: CloudFunctionRequest) {
+    console.debug(`EVENT: ${JSON.stringify(event)}`);
 
-interface Event {
-    httpMethod: 'DELETE' | 'GET' | 'HEAD' | 'OPTIONS' | 'PATCH' | 'POST' | 'PUT';
-    headers: {[key: string]: string;};
-    multiValueHeaders: {[key: string]: string[];};
-    queryStringParameters: {[key: string]: string;};
-    multiValueQueryStringParameters: {[key: string]: string[];};
-    body: string;
-    isBase64Encoded: boolean;
-}
-
-exports.handler = async function (event: Event) {
-    await bot.sendTextMessage(event.queryStringParameters.text);
-    return {
-        'statusCode': 200,
-        'headers': {
-            'Content-Type': 'text/plain'
-        },
-        'isBase64Encoded': false,
-        'body': event.body
+    let handlerResponse;
+    // Tracker trigger will repeat request if the previous one is failed
+    // So, the cloud function is executed twice or even more times. 
+    // As a result multiple identical posts will be posted to telegram
+    // It's bad! That's why all exceptions are caught there
+    try {
+        handlerResponse = await trackerWebhook(event);
+    } catch (e: unknown) {
+        console.error(`ERROR: ${e}`);
+        handlerResponse = {
+            'statusCode': 200,
+            'headers': {
+                'Content-Type': 'application/json'
+            },
+            'isBase64Encoded': false,
+            'body': {
+                error: (e as Error).message
+            }
+        } as CloudFunctionResponse;
     }
+
+    return handlerResponse;
 };

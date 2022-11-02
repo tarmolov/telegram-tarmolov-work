@@ -28,7 +28,7 @@ test: build test-manual
 .PHONY: test-manual
 test-manual:
 	@echo Run manual tests...
-	@${NODE_MODULES_BIN}mocha $(MOCHA_OPTIONS) --timeout 100000 "$(OUT_DIR)/tests/manual/**/*.test.js"
+	@${NODE_MODULES_BIN}mocha $(MOCHA_OPTIONS) $(MOCHA_EXTRA_OPTIONS) --timeout 100000 "$(OUT_DIR)/tests/manual/**/*.test.js"
 
 .PHONY: zip
 zip:
@@ -38,13 +38,14 @@ zip:
 deploy-serverless:
 	yc serverless function version create \
 	  --service-account-id ajefocfisp51nn3k11pb \
-	  --function-name=nodejs-function \
+	  --function-name=testing \
 	  --runtime nodejs16 \
 	  --entrypoint out/app/app.handler \
 	  --memory 128m \
 	  --execution-timeout 3s \
-	  --secret name=tarmolov-work_testing,key=TELEGRAM_BOT_TOKEN,environment-variable=TELEGRAM_BOT_TOKEN \
-	  --secret name=tarmolov-work_testing,key=TELEGRAM_CHANNEL_ID,environment-variable=TELEGRAM_CHANNEL_ID \
+	  --secret name=testing,key=TELEGRAM_BOT_TOKEN,environment-variable=TELEGRAM_BOT_TOKEN \
+	  --secret name=testing,key=TRACKER_OAUTH_TOKEN,environment-variable=TRACKER_OAUTH_TOKEN \
+	  --secret name=testing,key=TRACKER_ORG_ID,environment-variable=TRACKER_ORG_ID \
 	  --source-path $(OUT_DIR)/tarmolov_work.zip
 
 .PHONY: deploy-testing
