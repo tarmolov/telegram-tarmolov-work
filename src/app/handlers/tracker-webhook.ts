@@ -2,6 +2,7 @@ import {config} from '../config';
 import {TelegramProvider} from '../providers/telegram'
 import {CloudFunctionRequest, CloudFunctionResponse} from '../types';
 import {TrackerIssue, TrackerProvider} from '../providers/tracker';
+import {sanitizeTrackerMarkdown} from '../lib/utils';
 
 const trackerProvider = new TrackerProvider();
 
@@ -37,16 +38,26 @@ export async function trackerWebhook(event: CloudFunctionRequest) {
         throw new Error(`Issue ${issue.key} does not have filled description field`);
     }
 
-    const fieldKey = config['tracker.fields.prefix'] + publishUrlField;
-    const messageId = TelegramProvider.getMessageIdFromUrl(issue[fieldKey]);
-    console.debug(`MESSAGE_ID: ${messageId} (parsed from "${fieldKey}" field with "${issue[fieldKey]}" value`);
+    // if issue is scheduled, it cannot publish before the specified time
+    const scheduledDateTimeIsoStr = issue[config['tracker.fields.prefix'] + 'scheduledDateTime'];
+    const now = new Date();
+    const scheduledDateTime = scheduledDateTimeIsoStr && new Date(scheduledDateTimeIsoStr);
+    if (scheduledDateTime && now < scheduledDateTime) {
+        console.debug(`SCHEDULE: Skip publishing because scheduled time ${scheduledDateTime} > ${now} (current time)`);
+        return;
+    }
 
-    const message = await bot.sendTextMessage(issue.description, messageId);
+    const publishUrlFieldKey = config['tracker.fields.prefix'] + publishUrlField;
+    const messageId = TelegramProvider.getMessageIdFromUrl(issue[publishUrlFieldKey]);
+    console.debug(`MESSAGE_ID: ${messageId} (parsed from "${publishUrlFieldKey}" field with "${issue[publishUrlFieldKey]}" value)`);
+
+    const description = sanitizeTrackerMarkdown(issue.description);
+    const message = await bot.sendTextMessage(description, messageId);
     console.debug(`MESSAGE: ${JSON.stringify(message)}`);
 
     const publishDateTime = new Date(message.date * 1000).toISOString();
     const issueEdited = await trackerProvider.editIssue(payload.key, {
-        [fieldKey]: message.url,
+        [publishUrlFieldKey]: message.url,
         [`${config['tracker.fields.prefix']}publishDateTime`]: publishDateTime
     });
     console.debug(`ISSUE EDITED: ${JSON.stringify(issueEdited)}`);

@@ -5,6 +5,8 @@ MOCHA_OPTIONS ?= -R dot -r source-map-support/register -r src/tests/setup.js --e
 .PHONY: deps
 deps:
 	@npm i
+	@npm set-script prepare "husky install"
+	@npm run prepare
 
 .PHONY: env
 env:
@@ -23,12 +25,17 @@ validate:
 	@${NODE_MODULES_BIN}eslint src
 
 .PHONY: test
-test: build test-manual
+test: build test-unit test-functional
 
-.PHONY: test-manual
-test-manual:
-	@echo Run manual tests...
-	@${NODE_MODULES_BIN}mocha $(MOCHA_OPTIONS) $(MOCHA_EXTRA_OPTIONS) --timeout 100000 "$(OUT_DIR)/tests/manual/**/*.test.js"
+.PHONY: test-unit
+test-unit:
+	@echo Run unit tests...
+	@${NODE_MODULES_BIN}mocha $(MOCHA_OPTIONS) $(MOCHA_EXTRA_OPTIONS) "$(OUT_DIR)/tests/unit/**/*.test.js"
+
+.PHONY: test-functional
+test-functional:
+	@echo Run functional tests...
+	@${NODE_MODULES_BIN}mocha $(MOCHA_OPTIONS) $(MOCHA_EXTRA_OPTIONS) "$(OUT_DIR)/tests/functional/**/*.test.js"
 
 .PHONY: zip
 zip:

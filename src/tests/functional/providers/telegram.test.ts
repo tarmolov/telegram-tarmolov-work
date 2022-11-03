@@ -1,13 +1,13 @@
 import * as path from 'path';
 import {strict as assert} from 'assert';
-import {askQuestion} from '../utils/utils';
-import {TelegramProvider} from '../../app/providers/telegram';
+import {TelegramProvider} from '../../../app/providers/telegram';
 
 const TestPhotosFilenames = {
-    car: path.resolve(__dirname, '../../../resources/car.png'),
-    train: path.resolve(__dirname, '../../../resources/train.png')
+    car: path.resolve(__dirname, '../../../../resources/car.png'),
+    train: path.resolve(__dirname, '../../../../resources/train.png')
 };
 
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const bot = new TelegramProvider({channelId: process.env.TELEGRAM_TESTING_CHANNEL_ID!});
 
 describe('providers/telegram', () => {
@@ -16,14 +16,12 @@ describe('providers/telegram', () => {
         it('should send a text message', async () => {
             const response = await bot.sendTextMessage('*Test message*');
             textMessageTelegramUrl = response.url;
-            await askQuestion(`Message is posted: ${response.url}`);
             assert.equal(response.url.length !== 0, true);
         });
 
         it('should edit the text message', async () => {
             const messageId = TelegramProvider.getMessageIdFromUrl(textMessageTelegramUrl);
             const response = await bot.sendTextMessage('__Edited test message__', messageId);
-            await askQuestion(`Message is edited: ${response.url}`);
             assert.equal(response.url.length !== 0, true);
         });
     })
@@ -33,14 +31,12 @@ describe('providers/telegram', () => {
         it('should send a text message', async () => {
             const response = await bot.sendPhotoWithTextMessage(TestPhotosFilenames.car, '*Caption*');
             photoMessageTelegramUrl = response.url;
-            await askQuestion(`Message is posted: ${response.url}`);
             assert.equal(response.url.length !== 0, true);
         });
 
         it('should edit the text message', async () => {
             const messageId = TelegramProvider.getMessageIdFromUrl(photoMessageTelegramUrl);
             const response = await bot.sendPhotoWithTextMessage(TestPhotosFilenames.train, '__Edited caption__', messageId);
-            await askQuestion(`Message is edited: ${response.url}`);
             assert.equal(response.url.length !== 0, true);
         });
     })

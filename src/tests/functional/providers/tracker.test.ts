@@ -1,6 +1,6 @@
 import {strict as assert} from 'assert';
-import {config} from '../../app/config';
-import {TrackerProvider} from '../../app/providers/tracker';
+import {config} from '../../../app/config';
+import {TrackerProvider} from '../../../app/providers/tracker';
 
 const trackerProvider = new TrackerProvider();
 
