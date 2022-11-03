@@ -1,6 +1,7 @@
 {
   "name": "tarmolov_work",
   "version": "1.0.0",
+  "repository": "https://github.com/tarmolov/telegram-tarmolov-work",
   "dependencies": {
     "dotenv": "16.0.3",
     "got": "11.8.5",
@@ -18,7 +19,5 @@
     "source-map-support": "0.5.21",
     "typescript": "4.1.2"
   },
-  "scripts": {
-    "prepare": "husky install"
-  }
+  "license": "MIT"
 }

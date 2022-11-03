@@ -5,8 +5,7 @@ MOCHA_OPTIONS ?= -R dot -r source-map-support/register -r src/tests/setup.js --e
 .PHONY: deps
 deps:
 	@npm i
-	@npm set-script prepare "husky install"
-	@npm run prepare
+	@npx husky install
 
 .PHONY: env
 env:
