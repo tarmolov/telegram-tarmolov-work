@@ -1,7 +1,8 @@
 import * as dotenv from 'dotenv'
 dotenv.config()
 import {trackerWebhook} from './handlers/tracker-webhook';
-import {CloudFunctionRequest, CloudFunctionResponse} from './types';
+import {CloudFunctionRequest} from './types';
+import {formatCloudFunctionResponse} from './lib/utils';
 
 exports.handler = async function (event: CloudFunctionRequest) {
     console.debug(`EVENT: ${JSON.stringify(event)}`);
@@ -15,16 +16,7 @@ exports.handler = async function (event: CloudFunctionRequest) {
         handlerResponse = await trackerWebhook(event);
     } catch (e: unknown) {
         console.error(`ERROR: ${e}`);
-        handlerResponse = {
-            'statusCode': 200,
-            'headers': {
-                'Content-Type': 'application/json'
-            },
-            'isBase64Encoded': false,
-            'body': {
-                error: (e as Error).message
-            }
-        } as CloudFunctionResponse;
+        handlerResponse = formatCloudFunctionResponse((e as Error).message);
     }
 
     return handlerResponse;

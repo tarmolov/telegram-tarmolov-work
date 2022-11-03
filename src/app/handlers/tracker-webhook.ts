@@ -1,7 +1,8 @@
 import {config} from '../config';
 import {TelegramProvider} from '../providers/telegram'
-import {CloudFunctionRequest, CloudFunctionResponse} from '../types';
+import {CloudFunctionRequest} from '../types';
 import {TrackerIssue, TrackerProvider} from '../providers/tracker';
+import {formatCloudFunctionResponse} from '../lib/utils';
 import {sanitizeTrackerMarkdown} from '../lib/utils';
 
 const trackerProvider = new TrackerProvider();
@@ -44,7 +45,7 @@ export async function trackerWebhook(event: CloudFunctionRequest) {
     const scheduledDateTime = scheduledDateTimeIsoStr && new Date(scheduledDateTimeIsoStr);
     if (scheduledDateTime && now < scheduledDateTime) {
         console.debug(`SCHEDULE: Skip publishing because scheduled time ${scheduledDateTime} > ${now} (current time)`);
-        return;
+        return formatCloudFunctionResponse(`Skip issue ${issue.key}`);
     }
 
     const publishUrlFieldKey = config['tracker.fields.prefix'] + publishUrlField;
@@ -62,15 +63,8 @@ export async function trackerWebhook(event: CloudFunctionRequest) {
     });
     console.debug(`ISSUE EDITED: ${JSON.stringify(issueEdited)}`);
 
-    return {
-        'statusCode': 200,
-        'headers': {
-            'Content-Type': 'application/json'
-        },
-        'isBase64Encoded': false,
-        'body': {
-            urlToMessage: message.url,
-            publishDateTime
-        }
-    } as CloudFunctionResponse;
+    return formatCloudFunctionResponse({
+        urlToMessage: message.url,
+        publishDateTime
+    });
 }
