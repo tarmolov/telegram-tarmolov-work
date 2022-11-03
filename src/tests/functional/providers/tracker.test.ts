@@ -17,4 +17,15 @@ describe('providers/tracker', () => {
         });
         assert.equal(issue.summary, 'test');
     });
+
+    it('should get attachments', async () => {
+        const issueAttachments = await trackerProvider.getIssueAttachments('BLOGTEST-1');
+        assert.equal(issueAttachments.length > 0, true);
+    });
+
+    it('should download file', async () => {
+        const attachments = await trackerProvider.getIssueAttachments('BLOGTEST-1');
+        const downloadedFile = await trackerProvider.downloadIssueAttachment(attachments[0]);
+        assert.ok(downloadedFile);
+    });
 });

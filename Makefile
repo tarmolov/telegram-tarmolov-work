@@ -1,6 +1,6 @@
 OUT_DIR=out
 NODE_MODULES_BIN=node_modules/.bin/
-MOCHA_OPTIONS ?= -R dot -r source-map-support/register -r src/tests/setup.js --exit
+MOCHA_OPTIONS ?= -R dot -r source-map-support/register -r src/tests/setup.js -t 10000 --exit
 
 .PHONY: deps
 deps:
@@ -48,7 +48,7 @@ deploy-serverless:
 	  --runtime nodejs16 \
 	  --entrypoint out/app/app.handler \
 	  --memory 128m \
-	  --execution-timeout 3s \
+	  --execution-timeout 10s \
 	  --secret name=testing,key=TELEGRAM_BOT_TOKEN,environment-variable=TELEGRAM_BOT_TOKEN \
 	  --secret name=testing,key=TRACKER_OAUTH_TOKEN,environment-variable=TRACKER_OAUTH_TOKEN \
 	  --secret name=testing,key=TRACKER_ORG_ID,environment-variable=TRACKER_ORG_ID \

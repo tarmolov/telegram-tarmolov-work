@@ -31,6 +31,7 @@ export class TelegramProvider {
         return `https://t.me/c/${this._channelId.slice(4)}/${messageId}`
     }
 
+    // https://core.telegram.org/bots/api#sendmessage
     async sendTextMessage(text: string, messageId?: number): Promise<TelegramProviderResponse> {
         const response = messageId ?
             await this._bot.editMessageText(text, {
@@ -48,6 +49,7 @@ export class TelegramProvider {
         };
     }
 
+    // https://core.telegram.org/bots/api#sendphoto
     async sendPhotoWithTextMessage(filePath: string, caption?: string, messageId?: number): Promise<TelegramProviderResponse> {
         let response;
         if (messageId) {

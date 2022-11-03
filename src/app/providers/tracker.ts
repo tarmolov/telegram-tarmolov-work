@@ -1,3 +1,6 @@
+import {promisify} from 'node:util';
+import stream from 'node:stream';
+import fs from 'node:fs';
 import got from 'got';
 import {config} from '../config';
 import {HttpMethod} from '../types';
@@ -12,28 +15,60 @@ export interface TrackerIssue {
     [key: string]: string | undefined;
 }
 
+interface TrackerAttachment {
+    id: string;
+    name: string;
+    content: string;
+    createdAt?: string;
+    updatedAt?: string;
+}
+
+const pipeline = promisify(stream.pipeline);
+
 export class TrackerProvider {
     private readonly _host = config['tracker.host'];
+    private readonly _defaultHeaders = {
+        Authorization: `OAuth ${config['tracker.oauthToken']}`,
+        'X-Org-ID': config['tracker.orgId']
+    };
 
     private async _request(method: HttpMethod, path: string, data?: TrackerIssue) {
         const response = await got({
             method: method,
             url: `${this._host}${path}`,
-            headers: {
-                Authorization: `OAuth ${config['tracker.oauthToken']}`,
-                'X-Org-ID': config['tracker.orgId']
-            },
+            headers: this._defaultHeaders,
             json: data,
             responseType: 'json'
         });
         return response.body;
     }
 
+    // https://cloud.yandex.ru/docs/tracker/concepts/issues/get-issue
     async getIssueByKey(key: string) {
         return this._request('GET', `/v2/issues/${key}`) as Promise<TrackerIssue>;
     }
 
+    // https://cloud.yandex.ru/docs/tracker/concepts/issues/patch-issue
     async editIssue(key: string, data: TrackerIssue) {
         return this._request('PATCH', `/v2/issues/${key}`, data) as Promise<TrackerIssue>;
+    }
+
+    // https://cloud.yandex.ru/docs/tracker/concepts/issues/get-attachments-list
+    async getIssueAttachments(key: string) {
+        return await this._request('GET', `/v2/issues/${key}/attachments`) as TrackerAttachment[];
+    }
+
+    // https://cloud.yandex.ru/docs/tracker/concepts/issues/get-attachment
+    async downloadIssueAttachment(attachment: TrackerAttachment) {
+        const filePath = `/tmp/${attachment.name}`;
+
+        await pipeline(
+            got.stream(attachment.content, {
+                headers: this._defaultHeaders
+            }),
+            fs.createWriteStream(filePath)
+        );
+
+        return filePath;
     }
 }

@@ -53,7 +53,16 @@ export async function trackerWebhook(event: CloudFunctionRequest) {
     console.debug(`MESSAGE_ID: ${messageId} (parsed from "${publishUrlFieldKey}" field with "${issue[publishUrlFieldKey]}" value)`);
 
     const description = sanitizeTrackerMarkdown(issue.description);
-    const message = await bot.sendTextMessage(description, messageId);
+
+    let message;
+    const issueAttachments = await trackerProvider.getIssueAttachments(payload.key);
+    if (issueAttachments.length) {
+        const filePath = await trackerProvider.downloadIssueAttachment(issueAttachments[0]);
+        console.log(`DOWNLOAD ATTACHMENT: ${JSON.stringify(issueAttachments[0])}`);
+        message = await bot.sendPhotoWithTextMessage(filePath, description, messageId);
+    } else {
+        message = await bot.sendTextMessage(description, messageId);
+    }
     console.debug(`MESSAGE: ${JSON.stringify(message)}`);
 
     const publishDateTime = new Date(message.date * 1000).toISOString();
