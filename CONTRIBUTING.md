@@ -26,6 +26,12 @@ $ make validate
 $ make test
 ```
 
+## Send requests manually
+```
+$ ./src/tests/manual/tracker.sh
+$ ./src/tests/manual/telegram.sh
+```
+
 ## Deploy
 ### Testing
 1. Build and deploy a new version.
