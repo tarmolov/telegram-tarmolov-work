@@ -43,6 +43,6 @@ $ ./src/tests/manual/telegram.sh
 
 3. Invoke function
   ```
-  $ export $(cat .env | grep TELEGRAM_TESTING_CHANNEL_ID | xargs)
-  $ curl -v -X POST -H "Content-Type: application/json" -d '{"key": "BLOGTEST-6"}' "https://functions.yandexcloud.net/d4ecv7vnjs6o5502m7hn?channel_id=${TELEGRAM_TESTING_CHANNEL_ID}&publish_url_field=testing"
+  $ ./tools/make-request.sh
+  $ ./tools/make-request.sh '{"key": "BLOGTEST-4"}'
   ```
