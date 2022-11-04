@@ -28,4 +28,20 @@ describe('providers/tracker', () => {
         const downloadedFile = await trackerProvider.downloadIssueAttachment(attachments[0]);
         assert.ok(downloadedFile);
     });
+
+    describe('resolving issue', () => {
+        beforeEach(async () => {
+            const issueTransitions = await trackerProvider.getIssueTransitions('BLOGTEST-4');
+            const shouldReopen = issueTransitions.find((transition) => transition.id === 'reopen');
+            if (shouldReopen) {
+                await trackerProvider.changeIssueStatus('BLOGTEST-4', 'reopen');
+            }
+        });
+
+        it('should close issue', async () => {
+            await trackerProvider.changeIssueStatus('BLOGTEST-4', 'close', {
+                resolution: 'fixed'
+            });
+        });
+    });
 });

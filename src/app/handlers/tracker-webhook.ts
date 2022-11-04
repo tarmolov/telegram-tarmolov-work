@@ -2,8 +2,7 @@ import {config} from '../config';
 import {TelegramProvider} from '../providers/telegram'
 import {CloudFunctionRequest} from '../types';
 import {TrackerIssue, TrackerProvider} from '../providers/tracker';
-import {formatCloudFunctionResponse} from '../lib/utils';
-import {sanitizeTrackerMarkdown} from '../lib/utils';
+import {formatCloudFunctionResponse, transformMarkdown} from '../lib/utils';
 
 const trackerProvider = new TrackerProvider();
 
@@ -14,27 +13,23 @@ const trackerProvider = new TrackerProvider();
 export async function trackerWebhook(event: CloudFunctionRequest) {
     const channelId = event.queryStringParameters.channel_id;
     const publishUrlField = event.queryStringParameters.publish_url_field;
-
     if (!channelId || !publishUrlField) {
         throw new Error('Required parameters channel_id and publish_url_fields are missed');
     }
+
     const bot = new TelegramProvider({channelId: channelId});
 
     const body = event.isBase64Encoded ? Buffer.from(event.body, 'base64').toString() : event.body;
     const payload = JSON.parse(body) as TrackerIssue;
     console.debug(`PAYLOAD: ${JSON.stringify(payload)}`);
-
     if (!payload.key) {
         throw new Error('No issue key is passed');
     }
-
     if (!payload.key.startsWith(`${config['tracker.queue']}-`)) {
         throw new Error(`Issue ${payload.key} doesn't belong to ${config['tracker.queue']}`);
     }
 
     const issue = await trackerProvider.getIssueByKey(payload.key);
-    console.debug(`ISSUE: ${JSON.stringify(issue)}`);
-
     if (!issue.description) {
         throw new Error(`Issue ${issue.key} does not have filled description field`);
     }
@@ -43,34 +38,40 @@ export async function trackerWebhook(event: CloudFunctionRequest) {
     const scheduledDateTimeIsoStr = issue[config['tracker.fields.prefix'] + 'scheduledDateTime'];
     const now = new Date();
     const scheduledDateTime = scheduledDateTimeIsoStr && new Date(scheduledDateTimeIsoStr);
-    if (scheduledDateTime && now < scheduledDateTime) {
-        console.debug(`SCHEDULE: Skip publishing because scheduled time ${scheduledDateTime} > ${now} (current time)`);
-        return formatCloudFunctionResponse(`Skip issue ${issue.key}`);
+    if (scheduledDateTime) {
+        if (now < scheduledDateTime) {
+            console.debug(`SCHEDULE: Skip publishing because scheduled time ${scheduledDateTime} > ${now} (current time)`);
+            return formatCloudFunctionResponse(`Skip issue ${issue.key}`);
+        } else {
+            const issueTransitions = await trackerProvider.getIssueTransitions(payload.key);
+            const issueCanBeClosed = issueTransitions.find((transition) => transition.id === 'close');
+            if (issueCanBeClosed) {
+                await trackerProvider.changeIssueStatus(payload.key, 'close', {
+                    resolution: 'fixed'
+                });
+            }
+        }
     }
 
     const publishUrlFieldKey = config['tracker.fields.prefix'] + publishUrlField;
     const messageId = TelegramProvider.getMessageIdFromUrl(issue[publishUrlFieldKey]);
     console.debug(`MESSAGE_ID: ${messageId} (parsed from "${publishUrlFieldKey}" field with "${issue[publishUrlFieldKey]}" value)`);
 
-    const description = sanitizeTrackerMarkdown(issue.description);
-
     let message;
+    const description = transformMarkdown(issue.description);
     const issueAttachments = await trackerProvider.getIssueAttachments(payload.key);
     if (issueAttachments.length) {
         const filePath = await trackerProvider.downloadIssueAttachment(issueAttachments[0]);
-        console.log(`DOWNLOAD ATTACHMENT: ${JSON.stringify(issueAttachments[0])}`);
         message = await bot.sendPhotoWithTextMessage(filePath, description, messageId);
     } else {
         message = await bot.sendTextMessage(description, messageId);
     }
-    console.debug(`MESSAGE: ${JSON.stringify(message)}`);
 
     const publishDateTime = new Date(message.date * 1000).toISOString();
-    const issueEdited = await trackerProvider.editIssue(payload.key, {
+    await trackerProvider.editIssue(payload.key, {
         [publishUrlFieldKey]: message.url,
         [`${config['tracker.fields.prefix']}publishDateTime`]: publishDateTime
     });
-    console.debug(`ISSUE EDITED: ${JSON.stringify(issueEdited)}`);
 
     return formatCloudFunctionResponse({
         urlToMessage: message.url,

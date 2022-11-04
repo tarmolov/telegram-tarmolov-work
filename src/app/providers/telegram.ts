@@ -33,6 +33,7 @@ export class TelegramProvider {
 
     // https://core.telegram.org/bots/api#sendmessage
     async sendTextMessage(text: string, messageId?: number): Promise<TelegramProviderResponse> {
+        console.log(`TELEGRAM REQ: text="${JSON.stringify(text)}", messageId=${messageId}`)
         const response = messageId ?
             await this._bot.editMessageText(text, {
                 chat_id: this._channelId,
@@ -42,6 +43,7 @@ export class TelegramProvider {
             }) :
             await this._bot.sendMessage(this._channelId, text, {disable_web_page_preview: true, ...this._defaultOptions});
 
+        console.log(`TELEGRAM RES: ${JSON.stringify(response)}}`)
         return {
             type: 'text',
             url: this._formatToMessageUrl((response as TelegramBot.Message).message_id),
@@ -51,6 +53,7 @@ export class TelegramProvider {
 
     // https://core.telegram.org/bots/api#sendphoto
     async sendPhotoWithTextMessage(filePath: string, caption?: string, messageId?: number): Promise<TelegramProviderResponse> {
+        console.log(`TELEGRAM REQ: filePath="${filePath}", caption="${JSON.stringify(caption)}", messageId=${messageId}`)
         let response;
         if (messageId) {
             response = await this._bot.editMessageMedia(
@@ -77,6 +80,7 @@ export class TelegramProvider {
                 {}
             );
         }
+        console.log(`TELEGRAM RES: ${JSON.stringify(response)}}`)
 
         return {
             type: 'photo',

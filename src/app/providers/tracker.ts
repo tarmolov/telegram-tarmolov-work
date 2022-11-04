@@ -15,6 +15,11 @@ export interface TrackerIssue {
     [key: string]: string | undefined;
 }
 
+interface TrackerTransition {
+    id: string;
+    display: string;
+}
+
 interface TrackerAttachment {
     id: string;
     name: string;
@@ -33,6 +38,7 @@ export class TrackerProvider {
     };
 
     private async _request(method: HttpMethod, path: string, data?: TrackerIssue) {
+        console.log(`TRACKER REQ: ${method.toLocaleUpperCase()} ${this._host}${path} {${data || ''}}`);
         const response = await got({
             method: method,
             url: `${this._host}${path}`,
@@ -40,6 +46,7 @@ export class TrackerProvider {
             json: data,
             responseType: 'json'
         });
+        console.log(`TRACKER RES: ${JSON.stringify(response.body)}`);
         return response.body;
     }
 
@@ -51,6 +58,16 @@ export class TrackerProvider {
     // https://cloud.yandex.ru/docs/tracker/concepts/issues/patch-issue
     async editIssue(key: string, data: TrackerIssue) {
         return this._request('PATCH', `/v2/issues/${key}`, data) as Promise<TrackerIssue>;
+    }
+
+    // https://cloud.yandex.ru/docs/tracker/concepts/issues/get-transitions
+    async getIssueTransitions(key: string) {
+        return this._request('GET', `/v2/issues/${key}/transitions`) as Promise<TrackerTransition[]>;
+    }
+
+    // https://cloud.yandex.ru/docs/tracker/concepts/issues/new-transition
+    async changeIssueStatus(key: string, transitionId: string, data?: TrackerIssue) {
+        return this._request('POST', `/v2/issues/${key}/transitions/${transitionId}/_execute`, data) as Promise<TrackerTransition>;
     }
 
     // https://cloud.yandex.ru/docs/tracker/concepts/issues/get-attachments-list
