@@ -32,8 +32,9 @@ test-unit:
 	@${NODE_MODULES_BIN}mocha $(MOCHA_OPTIONS) $(MOCHA_EXTRA_OPTIONS) "$(OUT_DIR)/tests/unit/**/*.test.js"
 
 .PHONY: test-functional
-test-functional:
+test-functional: 
 	@echo Run functional tests...
+	@cp -r src/tests/__fixtures/ out/tests/__fixtures
 	@${NODE_MODULES_BIN}mocha $(MOCHA_OPTIONS) $(MOCHA_EXTRA_OPTIONS) "$(OUT_DIR)/tests/functional/**/*.test.js"
 
 .PHONY: zip

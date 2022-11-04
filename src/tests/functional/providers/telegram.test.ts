@@ -3,8 +3,8 @@ import {strict as assert} from 'assert';
 import {TelegramProvider} from '../../../app/providers/telegram';
 
 const TestPhotosFilenames = {
-    car: path.resolve(__dirname, '../../../../resources/car.png'),
-    train: path.resolve(__dirname, '../../../../resources/train.png')
+    car: path.resolve(__dirname, '../../__fixtures/car.png'),
+    train: path.resolve(__dirname, '../../__fixtures/train.png')
 };
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
