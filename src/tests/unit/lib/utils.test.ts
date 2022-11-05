@@ -2,7 +2,7 @@ import {strict as assert} from 'assert';
 import {transformMarkdown} from '../../../app/lib/utils';
 
 describe('utils', () => {
-    describe('transformMarkdown', ()  => {
+    describe('transformMarkdown', () => {
         const markdownExamples = {
             'Bold': {input: '**Полужирный**', expected: '*Полужирный*'},
             'Italic': {input: '*Курсив*', expected: '_Курсив_'},
@@ -31,7 +31,7 @@ describe('utils', () => {
 
         for (const [title, testData] of Object.entries(markdownExamples)) {
             it(title, () => {
-                assert.equal(testData.expected, transformMarkdown(testData.input));
+                assert.equal(transformMarkdown(testData.input), testData.expected);
             });
         }
     });
