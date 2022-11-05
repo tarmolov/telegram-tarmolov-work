@@ -32,7 +32,7 @@ test-unit:
 	@${NODE_MODULES_BIN}mocha $(MOCHA_OPTIONS) $(MOCHA_EXTRA_OPTIONS) "$(OUT_DIR)/tests/unit/**/*.test.js"
 
 .PHONY: test-functional
-test-functional: 
+test-functional:
 	@echo Run functional tests...
 	@cp -r src/tests/__fixtures/ out/tests/__fixtures
 	@${NODE_MODULES_BIN}mocha $(MOCHA_OPTIONS) $(MOCHA_EXTRA_OPTIONS) "$(OUT_DIR)/tests/functional/**/*.test.js"
@@ -41,8 +41,8 @@ test-functional:
 zip:
 	zip -r $(OUT_DIR)/tarmolov_work.zip out/app package.json package-lock.json
 
-.PHONY: deploy-serverless
-deploy-serverless:
+.PHONY: deploy-testing
+deploy-testing: clean build-production zip
 	yc serverless function version create \
 	  --service-account-id ajefocfisp51nn3k11pb \
 	  --function-name=testing \
@@ -50,13 +50,26 @@ deploy-serverless:
 	  --entrypoint out/app/app.handler \
 	  --memory 128m \
 	  --execution-timeout 10s \
+	  --environment ENVIRONMENT=testing \
 	  --secret name=testing,key=TELEGRAM_BOT_TOKEN,environment-variable=TELEGRAM_BOT_TOKEN \
 	  --secret name=testing,key=TRACKER_OAUTH_TOKEN,environment-variable=TRACKER_OAUTH_TOKEN \
 	  --secret name=testing,key=TRACKER_ORG_ID,environment-variable=TRACKER_ORG_ID \
 	  --source-path $(OUT_DIR)/tarmolov_work.zip
 
-.PHONY: deploy-testing
-deploy-testing: clean build-production zip deploy-serverless
+.PHONY: deploy-production
+deploy-production: clean build-production zip
+	yc serverless function version create \
+	  --service-account-id ajefocfisp51nn3k11pb \
+	  --function-name=production \
+	  --runtime nodejs16 \
+	  --entrypoint out/app/app.handler \
+	  --memory 128m \
+	  --execution-timeout 10s \
+	  --environment ENVIRONMENT=production \
+	  --secret name=production,key=TELEGRAM_BOT_TOKEN,environment-variable=TELEGRAM_BOT_TOKEN \
+	  --secret name=production,key=TRACKER_OAUTH_TOKEN,environment-variable=TRACKER_OAUTH_TOKEN \
+	  --secret name=production,key=TRACKER_ORG_ID,environment-variable=TRACKER_ORG_ID \
+	  --source-path $(OUT_DIR)/tarmolov_work.zip
 
 .PHONY: clean
 clean:

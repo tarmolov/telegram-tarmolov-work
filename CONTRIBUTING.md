@@ -46,3 +46,8 @@ $ ./src/tests/manual/telegram.sh
   $ ./tools/make-request.sh
   $ ./tools/make-request.sh '{"key": "BLOGTEST-4"}'
   ```
+
+### Production
+```
+$ make deploy-production
+```

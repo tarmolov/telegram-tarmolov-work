@@ -1,11 +1,6 @@
 import {strict as assert} from 'assert';
 import {transformMarkdown} from '../../../app/lib/utils';
 
-const msg =`
-
-`;
-console.log(transformMarkdown(msg))
-
 describe('utils', () => {
     describe('transformMarkdown', ()  => {
         const markdownExamples = {
