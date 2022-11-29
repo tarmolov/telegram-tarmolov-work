@@ -5,14 +5,22 @@ import got from 'got';
 import {config} from '../config';
 import {HttpMethod} from '../types';
 
-export interface TrackerIssue {
+export type TrackerIssue = TrackerIssueKnown & TrackerIssueUnKnown;
+interface TrackerIssueKnown {
     key?: string;
     summary?: string;
     description?: string;
     createdAt?: string;
     updatedAt?: string;
-
+    components?: TrackerComponent[];
+}
+interface TrackerIssueUnKnown {
     [key: string]: string | undefined;
+}
+
+interface TrackerComponent {
+    id: string;
+    display: string;
 }
 
 interface TrackerTransition {

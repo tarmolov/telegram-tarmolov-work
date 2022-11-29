@@ -2,7 +2,7 @@ import {config} from '../config';
 import {TelegramProvider} from '../providers/telegram'
 import {CloudFunctionRequest} from '../types';
 import {TrackerIssue, TrackerProvider} from '../providers/tracker';
-import {formatCloudFunctionResponse, transformMarkdown} from '../lib/utils';
+import {formatCloudFunctionResponse, formatIssueDescription} from '../lib/utils';
 
 const trackerProvider = new TrackerProvider();
 
@@ -10,9 +10,11 @@ const trackerProvider = new TrackerProvider();
 // Query parameters:
 // channel_id — Telegram channel ID where posts should be published
 // publish_url_field — Link to a published telegram message
+// debug — show debug information
 export async function trackerWebhook(event: CloudFunctionRequest) {
     const channelId = event.queryStringParameters.channel_id;
     const publishUrlField = event.queryStringParameters.publish_url_field;
+    const debug = Boolean(event.queryStringParameters.debug);
     if (!channelId || !publishUrlField) {
         throw new Error('Required parameters channel_id and publish_url_fields are missed');
     }
@@ -34,31 +36,12 @@ export async function trackerWebhook(event: CloudFunctionRequest) {
         throw new Error(`Issue ${issue.key} does not have filled description field`);
     }
 
-    // if issue is scheduled, it cannot publish before the specified time
-    const scheduledDateTimeIsoStr = issue[config['tracker.fields.prefix'] + 'scheduledDateTime'];
-    const now = new Date();
-    const scheduledDateTime = scheduledDateTimeIsoStr && new Date(scheduledDateTimeIsoStr);
-    if (scheduledDateTime) {
-        if (now < scheduledDateTime) {
-            console.debug(`SCHEDULE: Skip publishing because scheduled time ${scheduledDateTime} > ${now} (current time)`);
-            return formatCloudFunctionResponse(`Skip issue ${issue.key}`);
-        } else {
-            const issueTransitions = await trackerProvider.getIssueTransitions(payload.key);
-            const issueCanBeClosed = issueTransitions.find((transition) => transition.id === 'close');
-            if (issueCanBeClosed) {
-                await trackerProvider.changeIssueStatus(payload.key, 'close', {
-                    resolution: 'fixed'
-                });
-            }
-        }
-    }
-
     const publishUrlFieldKey = config['tracker.fields.prefix'] + publishUrlField;
     const messageId = TelegramProvider.getMessageIdFromUrl(issue[publishUrlFieldKey]);
     console.debug(`MESSAGE_ID: ${messageId} (parsed from "${publishUrlFieldKey}" field with "${issue[publishUrlFieldKey]}" value)`);
 
     let message;
-    const description = transformMarkdown(issue.description);
+    const description = formatIssueDescription(issue, debug);
     const issueAttachments = await trackerProvider.getIssueAttachments(payload.key);
     if (issueAttachments.length) {
         const filePath = await trackerProvider.downloadIssueAttachment(issueAttachments[0]);

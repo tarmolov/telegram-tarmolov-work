@@ -1,4 +1,27 @@
 import {CloudFunctionResponse} from "../types";
+import {TrackerIssue} from '../providers/tracker';
+
+export function formatIssueDescription(issue: TrackerIssue, debug?: boolean) {
+    let description = issue.description!;
+
+    if (issue.components) {
+        const components = issue.components
+            .map((component) => `#${component.display}`)
+            .join(' ');
+
+        description += `\n\n${components}`;
+    }
+
+    if (debug) {
+        description += [
+            '\n\n⎯⎯⎯⎯⎯  ✄ ⎯⎯⎯⎯⎯',
+            '**Служебная информация:**',
+            `* [Задача в трекере](https://tracker.yandex.ru/${issue.key})`
+        ].join('\n');
+    }
+
+    return transformMarkdown(description);
+}
 
 export function transformMarkdown(input: string) {
     // https://core.telegram.org/bots/api#markdownv2-style
