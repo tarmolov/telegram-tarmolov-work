@@ -127,7 +127,7 @@ export class TelegramProvider {
         return response as TelegramBot.Message;
     }
 
-    static getMessageIdFromUrl(telegramUrl: string | undefined): number | undefined {
+    static getMessageIdFromUrl(telegramUrl: string | undefined | null): number | undefined {
         if (!telegramUrl) {
             return undefined;
         }

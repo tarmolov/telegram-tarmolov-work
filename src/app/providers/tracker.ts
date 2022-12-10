@@ -15,7 +15,7 @@ interface TrackerIssueKnown {
     components?: TrackerComponent[];
 }
 interface TrackerIssueUnKnown {
-    [key: string]: string | undefined;
+    [key: string]: string | undefined | null;
 }
 
 interface TrackerComponent {

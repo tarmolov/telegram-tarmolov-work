@@ -2,6 +2,7 @@
 import * as assert from 'assert';
 
 export interface Config {
+    readonly 'app.secret': string;
     readonly 'tracker.host': string;
     readonly 'tracker.oauthToken': string;
     readonly 'tracker.orgId': string;
@@ -11,6 +12,7 @@ export interface Config {
 }
 
 export const production: Config = {
+    'app.secret': process.env.ACCESS_SECRET_KEY!,
     'tracker.host': 'https://api.tracker.yandex.net',
     'tracker.oauthToken': process.env.TRACKER_OAUTH_TOKEN!,
     'tracker.orgId': process.env.TRACKER_ORG_ID!,

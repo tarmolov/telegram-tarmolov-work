@@ -4,12 +4,12 @@ import {trackerWebhook} from './handlers/tracker-webhook';
 import {CloudFunctionRequest} from './types';
 import {formatCloudFunctionResponse} from './lib/utils';
 
-exports.handler = async function (event: CloudFunctionRequest) {
+export async function handler(event: CloudFunctionRequest) {
     console.debug(`EVENT: ${JSON.stringify(event)}`);
 
     let handlerResponse;
     // Tracker trigger will repeat request if the previous one is failed
-    // So, the cloud function is executed twice or even more times. 
+    // So, the cloud function is executed twice or even more times.
     // As a result multiple identical posts will be posted to telegram
     // It's bad! That's why all exceptions are caught there
     try {
@@ -20,4 +20,4 @@ exports.handler = async function (event: CloudFunctionRequest) {
     }
 
     return handlerResponse;
-};
+}

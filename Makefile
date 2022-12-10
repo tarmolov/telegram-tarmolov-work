@@ -1,7 +1,6 @@
 OUT_DIR=out
 NODE_MODULES_BIN=node_modules/.bin/
 MOCHA_OPTIONS ?= -R dot -r source-map-support/register -r src/tests/setup.js -t 10000 --exit
-
 .PHONY: deps
 deps:
 	@npm i
@@ -24,7 +23,7 @@ validate:
 	@${NODE_MODULES_BIN}eslint src
 
 .PHONY: test
-test: build test-unit test-functional
+test: build test-unit test-functional test-integration
 
 .PHONY: test-unit
 test-unit:
@@ -36,6 +35,11 @@ test-functional:
 	@echo Run functional tests...
 	@cp -r src/tests/__fixtures/ out/tests/__fixtures
 	@${NODE_MODULES_BIN}mocha $(MOCHA_OPTIONS) $(MOCHA_EXTRA_OPTIONS) "$(OUT_DIR)/tests/functional/**/*.test.js"
+
+.PHONY: test-integration
+test-integration:
+	@echo Run integration tests...
+	@${NODE_MODULES_BIN}mocha $(MOCHA_OPTIONS) $(MOCHA_EXTRA_OPTIONS) "$(OUT_DIR)/tests/integration/**/*.test.js"
 
 .PHONY: zip
 zip:
@@ -54,6 +58,7 @@ deploy-testing: clean build-production zip
 	  --secret name=testing,key=TELEGRAM_BOT_TOKEN,environment-variable=TELEGRAM_BOT_TOKEN \
 	  --secret name=testing,key=TRACKER_OAUTH_TOKEN,environment-variable=TRACKER_OAUTH_TOKEN \
 	  --secret name=testing,key=TRACKER_ORG_ID,environment-variable=TRACKER_ORG_ID \
+	  --secret name=testing,key=ACCESS_SECRET_KEY,environment-variable=ACCESS_SECRET_KEY \
 	  --source-path $(OUT_DIR)/tarmolov_work.zip
 
 .PHONY: deploy-production
@@ -69,6 +74,7 @@ deploy-production: clean build-production zip
 	  --secret name=production,key=TELEGRAM_BOT_TOKEN,environment-variable=TELEGRAM_BOT_TOKEN \
 	  --secret name=production,key=TRACKER_OAUTH_TOKEN,environment-variable=TRACKER_OAUTH_TOKEN \
 	  --secret name=production,key=TRACKER_ORG_ID,environment-variable=TRACKER_ORG_ID \
+	  --secret name=production,key=ACCESS_SECRET_KEY,environment-variable=ACCESS_SECRET_KEY \
 	  --source-path $(OUT_DIR)/tarmolov_work.zip
 
 .PHONY: clean
