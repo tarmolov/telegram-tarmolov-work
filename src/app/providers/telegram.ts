@@ -121,7 +121,6 @@ export class TelegramProvider {
                     },
                     {}
                 );
-                console.log(response)
             }
         }
         console.log(`TELEGRAM RES: ${JSON.stringify(response)}}`)
