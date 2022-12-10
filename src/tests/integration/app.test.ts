@@ -29,7 +29,7 @@ describe('app', () => {
 
     it('should show error for missed required params', async () => {
         const request = getCloudFunctionRequest({
-            headers: {'X-TARMOLOV-WORK-SECRET-KEY': config['app.secret']}
+            headers: {'X-Tarmolov-Work-Secret-Key': config['app.secret']}
         });
         const response = await handler(request);
         assert.equal(response.statusCode, 200);
@@ -38,7 +38,7 @@ describe('app', () => {
 
     it('should show error for missed issue key', async () => {
         const request = getCloudFunctionRequest({
-            headers: {'X-TARMOLOV-WORK-SECRET-KEY': config['app.secret']},
+            headers: {'X-Tarmolov-Work-Secret-Key': config['app.secret']},
             queryStringParameters: {
                 channel_id: process.env.TELEGRAM_TESTING_CHANNEL_ID!,
                 publish_url_field: 'testing'
@@ -51,7 +51,7 @@ describe('app', () => {
 
     it('should show error for wrong issue', async () => {
         const request = getCloudFunctionRequest({
-            headers: {'X-TARMOLOV-WORK-SECRET-KEY': config['app.secret']},
+            headers: {'X-Tarmolov-Work-Secret-Key': config['app.secret']},
             queryStringParameters: {
                 channel_id: process.env.TELEGRAM_TESTING_CHANNEL_ID!,
                 publish_url_field: 'testing'
@@ -65,7 +65,7 @@ describe('app', () => {
 
     it('should show error for issue with empty description', async () => {
         const request = getCloudFunctionRequest({
-            headers: {'X-TARMOLOV-WORK-SECRET-KEY': config['app.secret']},
+            headers: {'X-Tarmolov-Work-Secret-Key': config['app.secret']},
             queryStringParameters: {
                 channel_id: process.env.TELEGRAM_TESTING_CHANNEL_ID!,
                 publish_url_field: 'testing'
@@ -92,7 +92,7 @@ describe('app', () => {
 
             it('should post to telegram', async () => {
                 const request = getCloudFunctionRequest({
-                    headers: {'X-TARMOLOV-WORK-SECRET-KEY': config['app.secret']},
+                    headers: {'X-Tarmolov-Work-Secret-Key': config['app.secret']},
                     queryStringParameters: {
                         channel_id: process.env.TELEGRAM_TESTING_CHANNEL_ID!,
                         publish_url_field: 'testing'

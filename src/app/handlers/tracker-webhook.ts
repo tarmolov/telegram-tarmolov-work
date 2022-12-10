@@ -12,7 +12,7 @@ const trackerProvider = new TrackerProvider();
 // publish_url_field — Link to a published telegram message
 // debug — show debug information
 export async function trackerWebhook(event: CloudFunctionRequest) {
-    if (event.headers['X-TARMOLOV-WORK-SECRET-KEY'] !== config['app.secret']) {
+    if (event.headers['X-Tarmolov-Work-Secret-Key'] !== config['app.secret']) {
         throw new Error('Access denied');
     }
 
