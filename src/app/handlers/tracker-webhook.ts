@@ -19,7 +19,7 @@ export async function trackerWebhook(event: CloudFunctionRequest) {
         throw new Error('Required parameters channel_id and publish_url_fields are missed');
     }
 
-    const bot = new TelegramProvider({channelId: channelId});
+    const bot = new TelegramProvider({channelId});
 
     const body = event.isBase64Encoded ? Buffer.from(event.body, 'base64').toString() : event.body;
     const payload = JSON.parse(body) as TrackerIssue;
@@ -40,15 +40,14 @@ export async function trackerWebhook(event: CloudFunctionRequest) {
     const messageId = TelegramProvider.getMessageIdFromUrl(issue[publishUrlFieldKey]);
     console.debug(`MESSAGE_ID: ${messageId} (parsed from "${publishUrlFieldKey}" field with "${issue[publishUrlFieldKey]}" value)`);
 
-    let message;
     const description = formatIssueDescription(issue, debug);
     const issueAttachments = await trackerProvider.getIssueAttachments(payload.key);
-    if (issueAttachments.length) {
-        const filePath = await trackerProvider.downloadIssueAttachment(issueAttachments[0]);
-        message = await bot.sendPhotoWithTextMessage(filePath, description, messageId);
-    } else {
-        message = await bot.sendTextMessage(description, messageId);
-    }
+    const message = await bot.sendMessage(description, {
+        messageId,
+        file: issueAttachments.length ?
+            await trackerProvider.downloadIssueAttachment(issueAttachments[0]) :
+            undefined
+    });
 
     const publishDateTime = new Date(message.date * 1000).toISOString();
     await trackerProvider.editIssue(payload.key, {

@@ -2,7 +2,7 @@ import {CloudFunctionResponse} from "../types";
 import {TrackerIssue} from '../providers/tracker';
 
 export function formatIssueDescription(issue: TrackerIssue, debug?: boolean) {
-    let description = issue.description!;
+    let description = issue.description!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
 
     if (issue.components) {
         const components = issue.components

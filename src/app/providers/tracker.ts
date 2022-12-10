@@ -31,6 +31,7 @@ interface TrackerTransition {
 interface TrackerAttachment {
     id: string;
     name: string;
+    mimetype: string;
     content: string;
     createdAt?: string;
     updatedAt?: string;
@@ -94,6 +95,9 @@ export class TrackerProvider {
             fs.createWriteStream(filePath)
         );
 
-        return filePath;
+        return {
+            path: filePath,
+            mimeType: attachment.mimetype
+        };
     }
 }
