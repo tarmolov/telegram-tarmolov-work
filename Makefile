@@ -46,7 +46,7 @@ zip:
 	zip -r $(OUT_DIR)/tarmolov_work.zip out/app package.json package-lock.json
 
 .PHONY: deploy-testing
-deploy-testing: clean build-production zip
+deploy-testing: test clean build-production zip
 	yc serverless function version create \
 	  --service-account-id ajefocfisp51nn3k11pb \
 	  --function-name=testing \
@@ -62,7 +62,7 @@ deploy-testing: clean build-production zip
 	  --source-path $(OUT_DIR)/tarmolov_work.zip
 
 .PHONY: deploy-production
-deploy-production: clean build-production zip
+deploy-production: test clean build-production zip
 	yc serverless function version create \
 	  --service-account-id ajefocfisp51nn3k11pb \
 	  --function-name=production \
