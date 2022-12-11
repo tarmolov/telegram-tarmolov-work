@@ -3,6 +3,7 @@ import {TelegramProvider} from '../providers/telegram'
 import {CloudFunctionRequest} from '../types';
 import {TrackerIssue, TrackerProvider} from '../providers/tracker';
 import {formatCloudFunctionResponse, formatIssueDescription} from '../lib/utils';
+import {logger} from '../lib/logger';
 
 const trackerProvider = new TrackerProvider();
 
@@ -27,7 +28,7 @@ export async function trackerWebhook(event: CloudFunctionRequest) {
 
     const body = event.isBase64Encoded ? Buffer.from(event.body, 'base64').toString() : event.body;
     const payload = JSON.parse(body) as TrackerIssue;
-    console.debug(`PAYLOAD: ${JSON.stringify(payload)}`);
+    logger.debug(`PAYLOAD: ${JSON.stringify(payload)}`);
     if (!payload.key) {
         throw new Error('No issue key is passed');
     }
@@ -42,7 +43,7 @@ export async function trackerWebhook(event: CloudFunctionRequest) {
 
     const publishUrlFieldKey = config['tracker.fields.prefix'] + publishUrlField;
     const messageId = TelegramProvider.getMessageIdFromUrl(issue[publishUrlFieldKey]);
-    console.debug(`MESSAGE_ID: ${messageId} (parsed from "${publishUrlFieldKey}" field with "${issue[publishUrlFieldKey]}" value)`);
+    logger.debug(`MESSAGE_ID: ${messageId} (parsed from "${publishUrlFieldKey}" field with "${issue[publishUrlFieldKey]}" value)`);
 
     const description = formatIssueDescription(issue, debug);
     const issueAttachments = await trackerProvider.getIssueAttachments(payload.key);

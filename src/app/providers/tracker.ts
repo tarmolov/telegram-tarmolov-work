@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import got from 'got';
 import {config} from '../config';
 import {HttpMethod} from '../types';
+import {logger} from '../lib/logger';
 
 export type TrackerIssue = TrackerIssueKnown & TrackerIssueUnKnown;
 interface TrackerIssueKnown {
@@ -47,7 +48,7 @@ export class TrackerProvider {
     };
 
     private async _request(method: HttpMethod, path: string, data?: TrackerIssue) {
-        console.log(`TRACKER REQ: ${method.toLocaleUpperCase()} ${this._host}${path} {${data || ''}}`);
+        logger.debug(`TRACKER REQ: ${method.toLocaleUpperCase()} ${this._host}${path} {${data || ''}}`);
         const response = await got({
             method: method,
             url: `${this._host}${path}`,
@@ -55,7 +56,7 @@ export class TrackerProvider {
             json: data,
             responseType: 'json'
         });
-        console.log(`TRACKER RES: ${JSON.stringify(response.body)}`);
+        logger.debug(`TRACKER RES: ${JSON.stringify(response.body)}`);
         return response.body;
     }
 

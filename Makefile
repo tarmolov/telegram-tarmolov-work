@@ -28,18 +28,18 @@ test: build test-unit test-functional test-integration
 .PHONY: test-unit
 test-unit:
 	@echo Run unit tests...
-	@${NODE_MODULES_BIN}mocha $(MOCHA_OPTIONS) $(MOCHA_EXTRA_OPTIONS) "$(OUT_DIR)/tests/unit/**/*.test.js"
+	@NO_LOGGING=1 ${NODE_MODULES_BIN}mocha $(MOCHA_OPTIONS) $(MOCHA_EXTRA_OPTIONS) "$(OUT_DIR)/tests/unit/**/*.test.js"
 
 .PHONY: test-functional
 test-functional:
 	@echo Run functional tests...
 	@cp -r src/tests/__fixtures/ out/tests/__fixtures
-	@${NODE_MODULES_BIN}mocha $(MOCHA_OPTIONS) $(MOCHA_EXTRA_OPTIONS) "$(OUT_DIR)/tests/functional/**/*.test.js"
+	@NO_LOGGING=1 ${NODE_MODULES_BIN}mocha $(MOCHA_OPTIONS) $(MOCHA_EXTRA_OPTIONS) "$(OUT_DIR)/tests/functional/**/*.test.js"
 
 .PHONY: test-integration
 test-integration:
 	@echo Run integration tests...
-	@${NODE_MODULES_BIN}mocha $(MOCHA_OPTIONS) $(MOCHA_EXTRA_OPTIONS) "$(OUT_DIR)/tests/integration/**/*.test.js"
+	@NO_LOGGING=1 ${NODE_MODULES_BIN}mocha $(MOCHA_OPTIONS) $(MOCHA_EXTRA_OPTIONS) "$(OUT_DIR)/tests/integration/**/*.test.js"
 
 .PHONY: zip
 zip:

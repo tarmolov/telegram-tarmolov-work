@@ -3,9 +3,10 @@ dotenv.config()
 import {trackerWebhook} from './handlers/tracker-webhook';
 import {CloudFunctionRequest} from './types';
 import {formatCloudFunctionResponse} from './lib/utils';
+import {logger} from './lib/logger';
 
 export async function handler(event: CloudFunctionRequest) {
-    console.debug(`EVENT: ${JSON.stringify(event)}`);
+    logger.debug(`EVENT: ${JSON.stringify(event)}`);
 
     let handlerResponse;
     // Tracker trigger will repeat request if the previous one is failed
@@ -15,7 +16,7 @@ export async function handler(event: CloudFunctionRequest) {
     try {
         handlerResponse = await trackerWebhook(event);
     } catch (e: unknown) {
-        console.error(`ERROR: ${e}`);
+        logger.error(`ERROR: ${e}`);
         handlerResponse = formatCloudFunctionResponse((e as Error).message);
     }
 

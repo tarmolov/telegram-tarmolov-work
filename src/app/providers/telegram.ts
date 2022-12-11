@@ -4,6 +4,7 @@ import * as fs from 'fs';
 import * as url from 'url';
 import * as TelegramBot from 'node-telegram-bot-api';
 import {config} from '../config';
+import {logger} from '../lib/logger';
 
 export interface TelegramSendMessageOptions {
     messageId?: number;
@@ -59,7 +60,7 @@ export class TelegramProvider {
 
     // https://core.telegram.org/bots/api#sendmessage
     async sendTextMessage(text: string, messageId?: number): Promise<TelegramBot.Message> {
-        console.log(`TELEGRAM REQ: text="${JSON.stringify(text)}", messageId=${messageId}`)
+        logger.debug(`TELEGRAM REQ: text="${JSON.stringify(text)}", messageId=${messageId}`)
         const response = messageId ?
             await this._bot.editMessageText(text, {
                 chat_id: this._channelId,
@@ -69,7 +70,7 @@ export class TelegramProvider {
             }) :
             await this._bot.sendMessage(this._channelId, text, {disable_web_page_preview: true, ...this._defaultOptions});
 
-        console.log(`TELEGRAM RES: ${JSON.stringify(response)}}`)
+        logger.debug(`TELEGRAM RES: ${JSON.stringify(response)}}`)
         return response as TelegramBot.Message;
     }
 
@@ -84,7 +85,7 @@ export class TelegramProvider {
     }
 
     async _sendMediaWithTextMessage(filePath: string, fileType: 'photo' | 'video', caption?: string, messageId?: number): Promise<TelegramBot.Message> {
-        console.log(`TELEGRAM REQ: filePath="${filePath}", caption="${JSON.stringify(caption)}", messageId=${messageId}`)
+        logger.debug(`TELEGRAM REQ: filePath="${filePath}", caption="${JSON.stringify(caption)}", messageId=${messageId}`)
         let response;
         if (messageId) {
             response = await this._bot.editMessageMedia(
@@ -123,7 +124,7 @@ export class TelegramProvider {
                 );
             }
         }
-        console.log(`TELEGRAM RES: ${JSON.stringify(response)}}`)
+        logger.debug(`TELEGRAM RES: ${JSON.stringify(response)}}`)
         return response as TelegramBot.Message;
     }
 
