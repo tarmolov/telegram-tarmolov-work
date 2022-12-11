@@ -1,5 +1,6 @@
-import {CloudFunctionResponse} from "../types";
-import {TrackerIssue} from '../providers/tracker';
+import {CloudFunctionResponse} from '../types';
+import {TrackerIssue, TrackerComponent} from '../providers/tracker';
+import {config} from '../config';
 
 export function formatIssueDescription(issue: TrackerIssue, debug?: boolean) {
     let description = issue.description!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
@@ -16,11 +17,22 @@ export function formatIssueDescription(issue: TrackerIssue, debug?: boolean) {
         description += [
             '\n\n⎯⎯⎯⎯⎯  ✄ ⎯⎯⎯⎯⎯',
             '**Служебная информация:**',
-            `* [Задача в трекере](https://tracker.yandex.ru/${issue.key})`
+            `* [Задача в трекере](https://tracker.yandex.ru/${issue.key})`,
+            getApproversByComponents(issue.components)
         ].join('\n');
     }
 
     return transformMarkdown(description);
+}
+
+function getApproversByComponents(components: TrackerComponent[] = []) {
+    const approvers = components
+        .map((component) => config['tracker.components.approvers'][component.display])
+        .filter(Boolean);
+
+    return approvers.length ?
+        `* Получить ОК от ${approvers.join(', ')}` :
+        '';
 }
 
 export function transformMarkdown(input: string) {

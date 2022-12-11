@@ -18,7 +18,7 @@ interface TrackerIssueUnKnown {
     [key: string]: string | undefined | null;
 }
 
-interface TrackerComponent {
+export interface TrackerComponent {
     id: string;
     display: string;
 }
