@@ -25,7 +25,7 @@ describe('utils', () => {
                 ]
             } as TrackerIssue;
             const result = formatIssueDescription(issue, true);
-            assert.equal(result.includes('Получить ОК от'), true);
+            assert.equal(result.includes('Получить \`ОК\` от'), true);
         });
     });
 

@@ -26,12 +26,18 @@ export function formatIssueDescription(issue: TrackerIssue, debug?: boolean) {
 }
 
 function getApproversByComponents(components: TrackerComponent[] = []) {
-    const approvers = components
-        .map((component) => config['tracker.components.approvers'][component.display])
-        .filter(Boolean);
+    const approvers: string[] = [];
+
+    components
+        .forEach((component) => {
+            const componentApprovers = config['tracker.components.approvers'][component.display];
+            if (componentApprovers) {
+                approvers.push(...componentApprovers);
+            }
+        });
 
     return approvers.length ?
-        `* Получить ОК от ${approvers.join(', ')}` :
+        `* Получить \`ОК\` от ${approvers.join(', ')}` :
         '';
 }
 
