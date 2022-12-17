@@ -16,7 +16,7 @@ interface TrackerIssueKnown {
     components?: TrackerComponent[];
 }
 interface TrackerIssueUnKnown {
-    [key: string]: string | undefined | null;
+    [key: string]: string | undefined | object | null;
 }
 
 export interface TrackerComponent {
@@ -27,6 +27,18 @@ export interface TrackerComponent {
 interface TrackerTransition {
     id: string;
     display: string;
+}
+
+interface TrackerLink {
+    id: string;
+    type: {
+        id: string;
+    };
+    direction: 'inward' | 'outward';
+    status: {
+        id: string;
+        key: string;
+    };
 }
 
 interface TrackerAttachment {
@@ -68,6 +80,11 @@ export class TrackerProvider {
     // https://cloud.yandex.ru/docs/tracker/concepts/issues/patch-issue
     async editIssue(key: string, data: TrackerIssue) {
         return this._request('PATCH', `/v2/issues/${key}`, data) as Promise<TrackerIssue>;
+    }
+
+    // https://cloud.yandex.ru/docs/tracker/concepts/issues/get-links
+    async getIssueLinks(key: string) {
+        return this._request('GET', `/v2/issues/${key}/links`) as Promise<TrackerLink[]>;
     }
 
     // https://cloud.yandex.ru/docs/tracker/concepts/issues/get-transitions

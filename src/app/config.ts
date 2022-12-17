@@ -7,6 +7,7 @@ export interface Config {
     readonly 'tracker.oauthToken': string;
     readonly 'tracker.orgId': string;
     readonly 'tracker.queue': string;
+    readonly 'tracker.tags.error.blockedDeps': string;
     readonly 'tracker.components.approvers': Record<string, string[]>;
     readonly 'tracker.fields.prefix': string;
     readonly 'telegram.botToken': string;
@@ -17,6 +18,7 @@ export const production: Config = {
     'tracker.host': 'https://api.tracker.yandex.net',
     'tracker.oauthToken': process.env.TRACKER_OAUTH_TOKEN!,
     'tracker.orgId': process.env.TRACKER_ORG_ID!,
+    'tracker.tags.error.blockedDeps': 'error-blocked-deps',
     'tracker.queue': 'BLOG',
     'tracker.components.approvers': {},
     'tracker.fields.prefix': '635bb3a32bf1dd5fdb87553e--',

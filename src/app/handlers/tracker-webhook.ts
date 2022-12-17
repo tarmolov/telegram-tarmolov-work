@@ -7,12 +7,19 @@ import {logger} from '../lib/logger';
 
 const trackerProvider = new TrackerProvider();
 
-// Webhook for publishing posts from tracker to telegram
-// Query parameters:
-// channel_id — Telegram channel ID where posts should be published
-// publish_url_field — Link to a published telegram message
-// debug — show debug information
-export async function trackerWebhook(event: CloudFunctionRequest) {
+// Request data for webhook for publishing posts from tracker to telegram
+export interface TrackerWebhookEvent extends CloudFunctionRequest {
+    headers: {
+        'X-Tarmolov-Work-Secret-Key'?: string; // secret key for access webhook
+    };
+    queryStringParameters: {
+        channel_id?: string; // telegram channel ID where posts should be published
+        publish_url_field?: 'testing' | 'production'; // link to a published telegram message
+        debug?: string; // show debug information
+    }
+}
+
+export async function trackerWebhook(event: TrackerWebhookEvent) {
     if (event.headers['X-Tarmolov-Work-Secret-Key'] !== config['app.secret']) {
         throw new Error('Access denied');
     }
@@ -41,8 +48,19 @@ export async function trackerWebhook(event: CloudFunctionRequest) {
         throw new Error(`Issue ${issue.key} does not have filled description field`);
     }
 
+    const issueLinks = await trackerProvider.getIssueLinks(payload.key);
+    const blockedDeps = issueLinks.filter((link) =>
+        link.type.id === 'depends' && link.direction === 'outward' && link.status.key !== 'closed'
+    );
+    if (blockedDeps.length && publishUrlField === 'production') {
+        await trackerProvider.editIssue(payload.key, {
+            tags: {add: [config['tracker.tags.error.blockedDeps']]}
+        });
+        throw new Error(`Issue ${issue.key} has blocked dependencies`);
+    }
+
     const publishUrlFieldKey = config['tracker.fields.prefix'] + publishUrlField;
-    const messageId = TelegramProvider.getMessageIdFromUrl(issue[publishUrlFieldKey]);
+    const messageId = TelegramProvider.getMessageIdFromUrl(issue[publishUrlFieldKey]?.toString());
     logger.debug(`MESSAGE_ID: ${messageId} (parsed from "${publishUrlFieldKey}" field with "${issue[publishUrlFieldKey]}" value)`);
 
     const description = formatIssueDescription(issue, debug);

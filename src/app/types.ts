@@ -2,9 +2,9 @@ export type HttpMethod = 'DELETE' | 'GET' | 'HEAD' | 'OPTIONS' | 'PATCH' | 'POST
 
 export interface CloudFunctionRequest {
     httpMethod: HttpMethod;
-    headers: {[key: string]: string;};
+    headers: {[key: string]: string | undefined};
     multiValueHeaders: {[key: string]: string[];};
-    queryStringParameters: {[key: string]: string;};
+    queryStringParameters: {[key: string]: string | undefined};
     multiValueQueryStringParameters: {[key: string]: string[];};
     body: string;
     isBase64Encoded: boolean;

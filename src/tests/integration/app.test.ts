@@ -1,16 +1,16 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import {strict as assert} from 'assert';
-import {CloudFunctionRequest} from '../../app/types';
 import {config} from '../../app/config';
 import {handler} from '../../app/app';
 import {TrackerProvider} from '../../app/providers/tracker';
+import {TrackerWebhookEvent} from 'src/app/handlers/tracker-webhook';
 
 const trackerProvider = new TrackerProvider();
 
-function getCloudFunctionRequest(data: Record<string, unknown> = {}): CloudFunctionRequest {
+function getCloudFunctionRequest(data: Record<string, unknown> = {}): TrackerWebhookEvent {
     return {
         httpMethod: 'POST',
-        headers: {},
+        headers: {'X-Tarmolov-Work-Secret-Key': ''},
         multiValueHeaders: {},
         queryStringParameters: {},
         multiValueQueryStringParameters: {},
@@ -75,6 +75,28 @@ describe('app', () => {
         const response = await handler(request);
         assert.equal(response.statusCode, 200);
         assert.equal(response.body, 'Issue BLOGTEST-11 does not have filled description field');
+    });
+
+    describe('', () => {
+        beforeEach(async () => {
+            await trackerProvider.editIssue('BLOGTEST-18', {
+                tags: {remove: [config['tracker.tags.error.blockedDeps']]}
+            });
+        });
+
+        it('should show error for issue with blocked deps', async () => {
+            const request = getCloudFunctionRequest({
+                headers: {'X-Tarmolov-Work-Secret-Key': config['app.secret']},
+                queryStringParameters: {
+                    channel_id: process.env.TELEGRAM_TESTING_CHANNEL_ID!,
+                    publish_url_field: 'production'
+                },
+                body: '{"key": "BLOGTEST-18"}'
+            });
+            const response = await handler(request);
+            assert.equal(response.statusCode, 200);
+            assert.equal(response.body, 'Issue BLOGTEST-18 has blocked dependencies');
+        });
     });
 
     [
