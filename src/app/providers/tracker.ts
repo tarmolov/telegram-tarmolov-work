@@ -97,6 +97,15 @@ export class TrackerProvider {
         return this._request('POST', `/v2/issues/${key}/transitions/${transitionId}/_execute`, data) as Promise<TrackerTransition>;
     }
 
+    async safeChangeIssueStatus(key: string, transitionId: string, data?: TrackerIssue) {
+        const allowedTransitions = await this.getIssueTransitions(key);
+        const transition = allowedTransitions.find((transition) => transition.id === transitionId);
+
+        if (transition) {
+            return await this.changeIssueStatus(key, transitionId, data);
+        }
+    }
+
     // https://cloud.yandex.ru/docs/tracker/concepts/issues/get-attachments-list
     async getIssueAttachments(key: string) {
         return await this._request('GET', `/v2/issues/${key}/attachments`) as TrackerAttachment[];
@@ -117,5 +126,13 @@ export class TrackerProvider {
             path: filePath,
             mimeType: attachment.mimetype
         };
+    }
+
+    async downloadFirstIssueAttachment(key: string) {
+        const issueAttachments = await this.getIssueAttachments(key);
+
+        return issueAttachments.length ?
+            await this.downloadIssueAttachment(issueAttachments[0]) :
+            undefined;
     }
 }

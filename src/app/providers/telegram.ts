@@ -134,7 +134,9 @@ export class TelegramProvider {
         }
         const urlPath = url.parse(telegramUrl).pathname;
         if (urlPath) {
-            return Number(urlPath.split('/').pop());
+            const messageId = Number(urlPath.split('/').pop())
+            logger.debug(`MESSAGE_ID: ${messageId} (parsed from "${telegramUrl}")`);
+            return ;
         }
     }
 }

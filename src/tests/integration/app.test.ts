@@ -77,11 +77,13 @@ describe('app', () => {
         assert.equal(response.body, 'Issue BLOGTEST-11 does not have filled description field');
     });
 
-    describe('', () => {
+    describe('issue with blocked deps', () => {
         beforeEach(async () => {
-            await trackerProvider.editIssue('BLOGTEST-18', {
-                tags: {remove: [config['tracker.tags.error.blockedDeps']]}
-            });
+            const transitions = await trackerProvider.getIssueTransitions('BLOGTEST-18');
+            const reopenTransition = transitions.find((transition) => transition.display === 'reopen');
+            if (reopenTransition) {
+                await trackerProvider.changeIssueStatus('BLOGTEST-18', 'reopen');
+            }
         });
 
         it('should show error for issue with blocked deps', async () => {

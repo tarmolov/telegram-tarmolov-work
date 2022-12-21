@@ -53,30 +53,28 @@ export async function trackerWebhook(event: TrackerWebhookEvent) {
         link.type.id === 'depends' && link.direction === 'outward' && link.status.key !== 'closed'
     );
     if (blockedDeps.length && publishUrlField === 'production') {
-        await trackerProvider.editIssue(payload.key, {
-            tags: {add: [config['tracker.tags.error.blockedDeps']]}
+        await trackerProvider.safeChangeIssueStatus(payload.key, 'need_info', {
+            comment: `!!Обнаружены блокирующие зависимости.!!
+                Невозможно опубликовать пост. Необходимо опубликовать блокирующие посты.`
         });
         throw new Error(`Issue ${issue.key} has blocked dependencies`);
     }
 
     const publishUrlFieldKey = config['tracker.fields.prefix'] + publishUrlField;
     const messageId = TelegramProvider.getMessageIdFromUrl(issue[publishUrlFieldKey]?.toString());
-    logger.debug(`MESSAGE_ID: ${messageId} (parsed from "${publishUrlFieldKey}" field with "${issue[publishUrlFieldKey]}" value)`);
-
     const description = formatIssueDescription(issue, debug);
-    const issueAttachments = await trackerProvider.getIssueAttachments(payload.key);
-    const message = await bot.sendMessage(description, {
-        messageId,
-        file: issueAttachments.length ?
-            await trackerProvider.downloadIssueAttachment(issueAttachments[0]) :
-            undefined
-    });
+    const file = await trackerProvider.downloadFirstIssueAttachment(payload.key)
+    const message = await bot.sendMessage(description, {messageId, file});
 
     const publishDateTime = new Date(message.date * 1000).toISOString();
     await trackerProvider.editIssue(payload.key, {
         [publishUrlFieldKey]: message.url,
         [`${config['tracker.fields.prefix']}publishDateTime`]: publishDateTime
     });
+
+    if (publishUrlField === 'production') {
+        await trackerProvider.safeChangeIssueStatus(payload.key, 'closed');
+    }
 
     return formatCloudFunctionResponse({
         urlToMessage: message.url,
