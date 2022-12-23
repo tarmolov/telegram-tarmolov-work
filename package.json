@@ -6,9 +6,11 @@
   "dependencies": {
     "dotenv": "16.0.3",
     "got": "11.8.5",
+    "marked": "4.2.5",
     "node-telegram-bot-api": "0.59.0"
   },
   "devDependencies": {
+    "@types/marked": "4.0.8",
     "@types/mocha": "10.0.0",
     "@types/node": "18.11.7",
     "@types/node-telegram-bot-api": "0.57.6",

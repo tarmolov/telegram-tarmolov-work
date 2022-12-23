@@ -37,7 +37,7 @@ describe('providers/telegram', () => {
 
     describe('Photo message with caption', () => {
         let photoMessageTelegramUrl: string;
-        it('should send a text message', async () => {
+        it('should send photo message', async () => {
             const response = await bot.sendMessage('*Caption*', {
                 file: {
                     path: TestPhotosFilenames.car,
@@ -48,7 +48,7 @@ describe('providers/telegram', () => {
             assert.equal(response.url.length !== 0, true);
         });
 
-        it('should edit the text message', async () => {
+        it('should edit photo message', async () => {
             const response = await bot.sendMessage('__Edited caption__', {
                 messageId: TelegramProvider.getMessageIdFromUrl(photoMessageTelegramUrl),
                 file: {
@@ -62,7 +62,7 @@ describe('providers/telegram', () => {
 
     describe('Video message with caption', () => {
         let videoMessageTelegramUrl: string;
-        it('should send a text message', async () => {
+        it('should send video message', async () => {
             const response = await bot.sendMessage('*Caption*', {
                 file: {
                     path: TestVideoFilenames.earth,
@@ -73,7 +73,7 @@ describe('providers/telegram', () => {
             assert.equal(response.url.length !== 0, true);
         });
 
-        it('should edit the text message', async () => {
+        it('should edit video message', async () => {
             const response = await bot.sendMessage('__Edited caption__', {
                 messageId: TelegramProvider.getMessageIdFromUrl(videoMessageTelegramUrl),
                 file: {
