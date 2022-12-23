@@ -136,7 +136,7 @@ export class TelegramProvider {
         if (urlPath) {
             const messageId = Number(urlPath.split('/').pop())
             logger.debug(`MESSAGE_ID: ${messageId} (parsed from "${telegramUrl}")`);
-            return ;
+            return messageId;
         }
     }
 }
