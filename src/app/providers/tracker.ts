@@ -2,9 +2,9 @@ import {promisify} from 'node:util';
 import stream from 'node:stream';
 import fs from 'node:fs';
 import got from 'got';
-import {config} from '../config';
-import {HttpMethod} from '../types';
-import {logger} from '../lib/logger';
+import {config} from '../config.js';
+import {HttpMethod} from '../types.js';
+import {logger} from '../lib/logger.js';
 
 export type TrackerIssue = TrackerIssueKnown & TrackerIssueUnKnown;
 interface TrackerIssueKnown {

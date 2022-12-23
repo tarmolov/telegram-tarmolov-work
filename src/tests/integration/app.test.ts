@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import {strict as assert} from 'assert';
-import {config} from '../../app/config';
-import {handler} from '../../app/app';
-import {TrackerProvider} from '../../app/providers/tracker';
-import {TrackerWebhookEvent} from 'src/app/handlers/tracker-webhook';
+import {config} from '../../app/config.js';
+import {handler} from '../../app/app.js';
+import {TrackerProvider} from '../../app/providers/tracker.js';
+import {TrackerWebhookEvent} from 'src/app/handlers/tracker-webhook.js';
 
 const trackerProvider = new TrackerProvider();
 

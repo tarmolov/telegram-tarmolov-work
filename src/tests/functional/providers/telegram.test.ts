@@ -1,6 +1,9 @@
 import * as path from 'path';
 import {strict as assert} from 'assert';
-import {TelegramProvider} from '../../../app/providers/telegram';
+import {TelegramProvider} from '../../../app/providers/telegram.js';
+import {fileURLToPath} from 'node:url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const TestPhotosFilenames = {
     car: path.resolve(__dirname, '../../__fixtures/car.png'),

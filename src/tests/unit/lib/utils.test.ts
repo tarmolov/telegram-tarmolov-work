@@ -1,6 +1,7 @@
 import {strict as assert} from 'assert';
-import {TrackerIssue} from 'src/app/providers/tracker';
-import {transformMarkdown, formatIssueDescription} from '../../../app/lib/utils';
+import {TrackerIssue} from 'src/app/providers/tracker.js';
+import {transformMarkdown, formatIssueDescription} from '../../../app/lib/utils.js';
+
 
 describe('utils', () => {
     describe('formatIssueDescription', () => {

@@ -1,9 +1,9 @@
-import {config} from '../config';
-import {TelegramProvider} from '../providers/telegram'
-import {CloudFunctionRequest} from '../types';
-import {TrackerIssue, TrackerProvider} from '../providers/tracker';
-import {formatCloudFunctionResponse, formatIssueDescription} from '../lib/utils';
-import {logger} from '../lib/logger';
+import {config} from '../config.js';
+import {TelegramProvider} from '../providers/telegram.js'
+import {CloudFunctionRequest} from '../types.js';
+import {TrackerIssue, TrackerProvider} from '../providers/tracker.js';
+import {formatCloudFunctionResponse, formatIssueDescription} from '../lib/utils.js';
+import {logger} from '../lib/logger.js';
 
 const trackerProvider = new TrackerProvider();
 

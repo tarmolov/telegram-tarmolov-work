@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "name": "tarmolov_work",
   "version": "1.0.0",
   "repository": "https://github.com/tarmolov/telegram-tarmolov-work",

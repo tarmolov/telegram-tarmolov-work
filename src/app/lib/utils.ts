@@ -1,6 +1,6 @@
 import {CloudFunctionResponse} from '../types';
-import {TrackerIssue, TrackerComponent} from '../providers/tracker';
-import {config} from '../config';
+import {TrackerIssue, TrackerComponent} from '../providers/tracker.js';
+import {config} from '../config.js';
 
 export function formatIssueDescription(issue: TrackerIssue, debug?: boolean) {
     let description = issue.description!; // eslint-disable-line @typescript-eslint/no-non-null-assertion

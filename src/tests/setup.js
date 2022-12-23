@@ -1,2 +1,2 @@
-// eslint-disable-next-line
-require('dotenv').config(); // eslint-ignore
+import * as dotenv from 'dotenv';
+dotenv.config();

@@ -1,9 +1,9 @@
 import * as dotenv from 'dotenv'
 dotenv.config()
-import {trackerWebhook} from './handlers/tracker-webhook';
-import {CloudFunctionRequest} from './types';
-import {formatCloudFunctionResponse} from './lib/utils';
-import {logger} from './lib/logger';
+import {trackerWebhook} from './handlers/tracker-webhook.js';
+import {CloudFunctionRequest} from './types.js';
+import {formatCloudFunctionResponse} from './lib/utils.js';
+import {logger} from './lib/logger.js';
 
 export async function handler(event: CloudFunctionRequest) {
     logger.debug(`EVENT: ${JSON.stringify(event)}`);

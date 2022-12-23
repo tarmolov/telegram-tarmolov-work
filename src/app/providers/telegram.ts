@@ -3,8 +3,8 @@ process.env['NTBA_FIX_350'] = '1';
 import * as fs from 'fs';
 import * as url from 'url';
 import * as TelegramBot from 'node-telegram-bot-api';
-import {config} from '../config';
-import {logger} from '../lib/logger';
+import {config} from '../config.js';
+import {logger} from '../lib/logger.js';
 
 export interface TelegramSendMessageOptions {
     messageId?: number;
