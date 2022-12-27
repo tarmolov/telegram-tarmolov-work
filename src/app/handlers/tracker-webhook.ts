@@ -1,3 +1,4 @@
+import {z} from 'zod';
 import {config} from '../config.js';
 import {TelegramProvider} from '../providers/telegram.js'
 import {CloudFunctionRequest} from '../types.js';
@@ -7,73 +8,95 @@ import {logger} from '../lib/logger.js';
 
 const trackerProvider = new TrackerProvider();
 
-// Request data for webhook for publishing posts from tracker to telegram
-export interface TrackerWebhookEvent extends CloudFunctionRequest {
-    headers: {
-        'X-Tarmolov-Work-Secret-Key'?: string; // secret key for access webhook
-    };
-    queryStringParameters: {
-        channel_id?: string; // telegram channel ID where posts should be published
-        publish_url_field?: 'testing' | 'production'; // link to a published telegram message
-        debug?: string; // show debug information
-    }
-}
+const RequestSchema = z.object({
+    headers: z.object({
+        'X-Tarmolov-Work-Secret-Key': z.string()
+            .refine((secret) => secret === config['app.secret'], {message: 'Access denied'})
+    }),
+    queryStringParameters: z.object({
+        channel_id: z.string(),
+        publish_url_field: z.enum(['testing', 'production']),
+        debug: z.string().optional()
+    }),
+    isBase64Encoded: z.boolean().optional(),
+    body: z.string()
+})
+    .transform((schema, ctx) => {
+        schema.body = schema.isBase64Encoded ? Buffer.from(schema.body, 'base64').toString() : schema.body;
 
-export async function trackerWebhook(event: TrackerWebhookEvent) {
-    if (event.headers['X-Tarmolov-Work-Secret-Key'] !== config['app.secret']) {
-        throw new Error('Access denied');
-    }
+        const body = JSON.parse(schema.body);
+        if (!body.key) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ['body'],
+                message: 'No issue key is passed',
+              });
+        }
+        if (!body.key?.startsWith(`${config['tracker.queue']}-`)) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ['body', 'key'],
+                message: `Issue doesn't belong to ${config['tracker.queue']}`,
+              });
+        }
 
-    const channelId = event.queryStringParameters.channel_id;
-    const publishUrlField = event.queryStringParameters.publish_url_field;
-    const debug = Boolean(event.queryStringParameters.debug);
-    if (!channelId || !publishUrlField) {
-        throw new Error('Required parameters channel_id and publish_url_fields are missed');
-    }
+        return schema;
+    });
 
-    const bot = new TelegramProvider({channelId});
+export type TrackerWebhookEvent = z.infer<typeof RequestSchema> & CloudFunctionRequest;
 
-    const body = event.isBase64Encoded ? Buffer.from(event.body, 'base64').toString() : event.body;
-    const payload = JSON.parse(body) as TrackerIssue;
-    logger.debug(`PAYLOAD: ${JSON.stringify(payload)}`);
-    if (!payload.key) {
-        throw new Error('No issue key is passed');
-    }
-    if (!payload.key.startsWith(`${config['tracker.queue']}-`)) {
-        throw new Error(`Issue ${payload.key} doesn't belong to ${config['tracker.queue']}`);
-    }
-
-    const issue = await trackerProvider.getIssueByKey(payload.key);
+async function getTrackerIssueByKey(key: string, checkIssueDeps?: boolean) {
+    const issue = await trackerProvider.getIssueByKey(key);
     if (!issue.description) {
         throw new Error(`Issue ${issue.key} does not have filled description field`);
     }
 
-    const issueLinks = await trackerProvider.getIssueLinks(payload.key);
+    const issueLinks = await trackerProvider.getIssueLinks(key);
     const blockedDeps = issueLinks.filter((link) =>
         link.type.id === 'depends' && link.direction === 'outward' && link.status.key !== 'closed'
     );
-    if (blockedDeps.length && publishUrlField === 'production') {
-        await trackerProvider.safeChangeIssueStatus(payload.key, 'need_info', {
+    if (blockedDeps.length && checkIssueDeps) {
+        await trackerProvider.safeChangeIssueStatus(key, 'need_info', {
             comment: `!!Обнаружены блокирующие зависимости.!!
                 Невозможно опубликовать пост. Необходимо опубликовать блокирующие посты.`
         });
         throw new Error(`Issue ${issue.key} has blocked dependencies`);
     }
 
+    return issue as TrackerIssue & {key: string};
+}
+
+export async function trackerWebhook(event: TrackerWebhookEvent) {
+    const requestResult = RequestSchema.safeParse(event);
+
+    if (!requestResult.success) {
+        const message = requestResult.error.issues
+            .map((issue) => `Error with parameter "${issue.path.join('/')}": ${issue.message}`)
+            .join('; ');
+        throw new Error(message);
+    }
+    const request = requestResult.data;
+    const payload = JSON.parse(request.body);
+    logger.debug(`PAYLOAD: ${JSON.stringify(payload)}`);
+    const {publish_url_field: publishUrlField, channel_id: channelId, debug} = request.queryStringParameters;
+    const isProduction = publishUrlField === 'production';
+    const issue = await getTrackerIssueByKey(payload.key, isProduction);
+
+    const bot = new TelegramProvider({channelId});
     const publishUrlFieldKey = config['tracker.fields.prefix'] + publishUrlField;
     const messageId = TelegramProvider.getMessageIdFromUrl(issue[publishUrlFieldKey]?.toString());
-    const description = formatIssueDescription(issue, debug);
-    const file = await trackerProvider.downloadFirstIssueAttachment(payload.key)
+    const description = formatIssueDescription(issue, Boolean(debug));
+    const file = await trackerProvider.downloadFirstIssueAttachment(issue.key)
     const message = await bot.sendMessage(description, {messageId, file});
 
     const publishDateTime = new Date(message.date * 1000).toISOString();
-    await trackerProvider.editIssue(payload.key, {
+    await trackerProvider.editIssue(issue.key, {
         [publishUrlFieldKey]: message.url,
         [`${config['tracker.fields.prefix']}publishDateTime`]: publishDateTime
     });
 
-    if (publishUrlField === 'production') {
-        await trackerProvider.safeChangeIssueStatus(payload.key, 'closed');
+    if (isProduction) {
+        await trackerProvider.safeChangeIssueStatus(issue.key, 'closed');
     }
 
     return formatCloudFunctionResponse({

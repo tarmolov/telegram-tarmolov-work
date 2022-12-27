@@ -2,7 +2,7 @@ process.env['NTBA_FIX_350'] = '1';
 
 import * as fs from 'fs';
 import * as url from 'url';
-import * as TelegramBot from 'node-telegram-bot-api';
+import {default as TelegramBot} from 'node-telegram-bot-api';
 import {config} from '../config.js';
 import {logger} from '../lib/logger.js';
 
@@ -32,7 +32,7 @@ export class TelegramProvider {
 
     constructor(options: TelegramProviderOptions) {
         this._channelId = options.channelId;
-        this._bot = new TelegramBot.default(config['telegram.botToken']);
+        this._bot = new TelegramBot(config['telegram.botToken']);
     }
 
     private _formatToMessageUrl(messageId: number) {

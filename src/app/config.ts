@@ -13,7 +13,7 @@ export interface Config {
     readonly 'telegram.botToken': string;
 }
 
-export const production: Config = {
+const production: Config = {
     'app.secret': process.env.ACCESS_SECRET_KEY!,
     'tracker.host': 'https://api.tracker.yandex.net',
     'tracker.oauthToken': process.env.TRACKER_OAUTH_TOKEN!,

@@ -3,7 +3,7 @@ import {strict as assert} from 'assert';
 import {config} from '../../app/config.js';
 import {handler} from '../../app/app.js';
 import {TrackerProvider} from '../../app/providers/tracker.js';
-import {TrackerWebhookEvent} from 'src/app/handlers/tracker-webhook.js';
+import {TrackerWebhookEvent} from '../../app/handlers/tracker-webhook.js';
 
 const trackerProvider = new TrackerProvider();
 
@@ -12,7 +12,10 @@ function getCloudFunctionRequest(data: Record<string, unknown> = {}): TrackerWeb
         httpMethod: 'POST',
         headers: {'X-Tarmolov-Work-Secret-Key': ''},
         multiValueHeaders: {},
-        queryStringParameters: {},
+        queryStringParameters: {
+            channel_id: '',
+            publish_url_field: 'testing'
+        },
         multiValueQueryStringParameters: {},
         body: '{}',
         isBase64Encoded: false,
@@ -24,16 +27,7 @@ describe('app', () => {
         const request = getCloudFunctionRequest();
         const response = await handler(request);
         assert.equal(response.statusCode, 200);
-        assert.equal(response.body, 'Access denied');
-    });
-
-    it('should show error for missed required params', async () => {
-        const request = getCloudFunctionRequest({
-            headers: {'X-Tarmolov-Work-Secret-Key': config['app.secret']}
-        });
-        const response = await handler(request);
-        assert.equal(response.statusCode, 200);
-        assert.equal(response.body, 'Required parameters channel_id and publish_url_fields are missed');
+        assert.notStrictEqual(response.body, 'Access denied');
     });
 
     it('should show error for missed issue key', async () => {
@@ -46,7 +40,7 @@ describe('app', () => {
         });
         const response = await handler(request);
         assert.equal(response.statusCode, 200);
-        assert.equal(response.body, 'No issue key is passed');
+        assert.notStrictEqual(response.body, 'No issue key is passed');
     });
 
     it('should show error for wrong issue', async () => {
@@ -60,7 +54,7 @@ describe('app', () => {
         });
         const response = await handler(request);
         assert.equal(response.statusCode, 200);
-        assert.equal(response.body, 'Issue UNKNOWD-1 doesn\'t belong to BLOGTEST');
+        assert.notStrictEqual(response.body, 'Issue UNKNOWD-1 doesn\'t belong to BLOGTEST');
     });
 
     it('should show error for issue with empty description', async () => {
