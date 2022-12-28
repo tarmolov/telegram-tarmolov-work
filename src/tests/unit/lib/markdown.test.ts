@@ -21,9 +21,10 @@ describe('markdown', () => {
             },
             'Code inline': {input: '`inline code`', expected: '`inline code`'},
             'Code block': {input: '```\ncode block\n```', expected: '```\ncode block\n```'},
+            'Empty line': {input: '1\n\n2', expected: '1\n\n2'},
             'Bold + Italic + Unordered list': {
                 input: '*Курсив*\n**Полужирный**\n*Курсив*\n* один\n* два',
-                expected: '_Курсив_\n*Полужирный*\n_Курсив_\n\n\n\\- один\n\\- два'
+                expected: '_Курсив_\n*Полужирный*\n_Курсив_\n\\- один\n\\- два'
             },
             'Escape forbiden symbols': {
                 input: '> #Hel-lo!',

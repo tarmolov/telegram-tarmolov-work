@@ -13,11 +13,6 @@ const RequestSchema = z.object({
         'X-Tarmolov-Work-Secret-Key': z.string()
             .refine((secret) => secret === config['app.secret'], {message: 'Access denied'})
     }),
-    queryStringParameters: z.object({
-        channel_id: z.string(),
-        publish_url_field: z.enum(['testing', 'production']),
-        debug: z.string().optional()
-    }),
     isBase64Encoded: z.boolean().optional(),
     body: z.string()
 })
@@ -45,7 +40,7 @@ const RequestSchema = z.object({
 
 export type TrackerWebhookEvent = z.infer<typeof RequestSchema> & CloudFunctionRequest;
 
-async function getTrackerIssueByKey(key: string, checkIssueDeps?: boolean) {
+async function getTrackerIssueByKey(key: string) {
     const issue = await trackerProvider.getIssueByKey(key);
     if (!issue.description) {
         throw new Error(`Issue ${issue.key} does not have filled description field`);
@@ -55,7 +50,7 @@ async function getTrackerIssueByKey(key: string, checkIssueDeps?: boolean) {
     const blockedDeps = issueLinks.filter((link) =>
         link.type.id === 'depends' && link.direction === 'outward' && link.status.key !== 'closed'
     );
-    if (blockedDeps.length && checkIssueDeps) {
+    if (blockedDeps.length && config['tracker.checkIssueDeps']) {
         await trackerProvider.safeChangeIssueStatus(key, 'need_info', {
             comment: `!!Обнаружены блокирующие зависимости.!!
                 Невозможно опубликовать пост. Необходимо опубликовать блокирующие посты.`
@@ -78,24 +73,22 @@ export async function trackerWebhook(event: TrackerWebhookEvent) {
     const request = requestResult.data;
     const payload = JSON.parse(request.body);
     logger.debug(`PAYLOAD: ${JSON.stringify(payload)}`);
-    const {publish_url_field: publishUrlField, channel_id: channelId, debug} = request.queryStringParameters;
-    const isProduction = publishUrlField === 'production';
-    const issue = await getTrackerIssueByKey(payload.key, isProduction);
+    const issue = await getTrackerIssueByKey(payload.key);
 
-    const bot = new TelegramProvider({channelId});
-    const publishUrlFieldKey = config['tracker.fields.prefix'] + publishUrlField;
+    const bot = new TelegramProvider({channelId: config['telegram.channelId']});
+    const publishUrlFieldKey = config['tracker.fields.publishUrl'];
     const messageId = TelegramProvider.getMessageIdFromUrl(issue[publishUrlFieldKey]?.toString());
-    const description = formatIssueDescription(issue, Boolean(debug));
+    const description = formatIssueDescription(issue, config['app.debug']);
     const file = await trackerProvider.downloadFirstIssueAttachment(issue.key)
     const message = await bot.sendMessage(description, {messageId, file});
 
     const publishDateTime = new Date(message.date * 1000).toISOString();
     await trackerProvider.editIssue(issue.key, {
         [publishUrlFieldKey]: message.url,
-        [`${config['tracker.fields.prefix']}publishDateTime`]: publishDateTime
+        [config['tracker.fields.publisDateTime']]: publishDateTime
     });
 
-    if (isProduction) {
+    if (config['tracker.closeIssueAfterPublishing']) {
         await trackerProvider.safeChangeIssueStatus(issue.key, 'closed');
     }
 

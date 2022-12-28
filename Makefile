@@ -45,36 +45,32 @@ test-integration:
 zip:
 	zip -r $(OUT_DIR)/tarmolov_work.zip out/app package.json package-lock.json
 
-.PHONY: deploy-testing
-deploy-testing: test clean build-production zip
-	yc serverless function version create \
-	  --service-account-id ajefocfisp51nn3k11pb \
-	  --function-name=testing \
-	  --runtime nodejs16 \
-	  --entrypoint out/app/app.handler \
-	  --memory 128m \
-	  --execution-timeout 10s \
-	  --environment ENVIRONMENT=testing \
-	  --secret name=testing,key=TELEGRAM_BOT_TOKEN,environment-variable=TELEGRAM_BOT_TOKEN \
-	  --secret name=testing,key=TRACKER_OAUTH_TOKEN,environment-variable=TRACKER_OAUTH_TOKEN \
-	  --secret name=testing,key=TRACKER_ORG_ID,environment-variable=TRACKER_ORG_ID \
-	  --secret name=testing,key=ACCESS_SECRET_KEY,environment-variable=ACCESS_SECRET_KEY \
-	  --source-path $(OUT_DIR)/tarmolov_work.zip
-
 .PHONY: deploy-production
 deploy-production: test clean build-production zip
+	$(MAKE) deploy ENV=prestable SECRET_ENV=production
+	$(MAKE) deploy ENV=production SECRET_ENV=production
+
+.PHONY: deploy-testing
+deploy-testing: test clean build-production zip
+	$(MAKE) deploy ENV=development SECRET_ENV=testing
+	$(MAKE) deploy ENV=testing SECRET_ENV=testing
+
+.PHONY: deploy
+deploy:
+	@echo
+	@echo Deploying $(ENV)...
 	yc serverless function version create \
 	  --service-account-id ajefocfisp51nn3k11pb \
-	  --function-name=production \
+	  --function-name=$(ENV) \
 	  --runtime nodejs16 \
 	  --entrypoint out/app/app.handler \
 	  --memory 128m \
 	  --execution-timeout 10s \
-	  --environment ENVIRONMENT=production \
-	  --secret name=production,key=TELEGRAM_BOT_TOKEN,environment-variable=TELEGRAM_BOT_TOKEN \
-	  --secret name=production,key=TRACKER_OAUTH_TOKEN,environment-variable=TRACKER_OAUTH_TOKEN \
-	  --secret name=production,key=TRACKER_ORG_ID,environment-variable=TRACKER_ORG_ID \
-	  --secret name=production,key=ACCESS_SECRET_KEY,environment-variable=ACCESS_SECRET_KEY \
+	  --environment ENVIRONMENT=$(ENV) \
+	  --secret name=$(SECRET_ENV),key=TELEGRAM_BOT_TOKEN,environment-variable=TELEGRAM_BOT_TOKEN \
+	  --secret name=$(SECRET_ENV),key=TRACKER_OAUTH_TOKEN,environment-variable=TRACKER_OAUTH_TOKEN \
+	  --secret name=$(SECRET_ENV),key=TRACKER_ORG_ID,environment-variable=TRACKER_ORG_ID \
+	  --secret name=$(SECRET_ENV),key=ACCESS_SECRET_KEY,environment-variable=ACCESS_SECRET_KEY \
 	  --source-path $(OUT_DIR)/tarmolov_work.zip
 
 .PHONY: clean

@@ -13,7 +13,7 @@ describe('providers/tracker', () => {
     it('should edit the issue', async () => {
         const issue = await trackerProvider.editIssue('BLOGTEST-4', {
             summary: 'Отредактированное тестовое сообщение',
-            [`${config['tracker.fields.prefix']}publishDateTime`]: new Date().toISOString()
+            [config['tracker.fields.publisDateTime']]: new Date().toISOString()
         });
         assert.equal(issue.summary, 'Отредактированное тестовое сообщение');
     });

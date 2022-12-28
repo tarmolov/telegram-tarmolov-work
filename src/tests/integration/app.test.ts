@@ -12,10 +12,7 @@ function getCloudFunctionRequest(data: Record<string, unknown> = {}): TrackerWeb
         httpMethod: 'POST',
         headers: {'X-Tarmolov-Work-Secret-Key': ''},
         multiValueHeaders: {},
-        queryStringParameters: {
-            channel_id: '',
-            publish_url_field: 'testing'
-        },
+        queryStringParameters: {},
         multiValueQueryStringParameters: {},
         body: '{}',
         isBase64Encoded: false,
@@ -32,11 +29,7 @@ describe('app', () => {
 
     it('should show error for missed issue key', async () => {
         const request = getCloudFunctionRequest({
-            headers: {'X-Tarmolov-Work-Secret-Key': config['app.secret']},
-            queryStringParameters: {
-                channel_id: process.env.TELEGRAM_TESTING_CHANNEL_ID!,
-                publish_url_field: 'testing'
-            }
+            headers: {'X-Tarmolov-Work-Secret-Key': config['app.secret']}
         });
         const response = await handler(request);
         assert.equal(response.statusCode, 200);
@@ -46,10 +39,6 @@ describe('app', () => {
     it('should show error for wrong issue', async () => {
         const request = getCloudFunctionRequest({
             headers: {'X-Tarmolov-Work-Secret-Key': config['app.secret']},
-            queryStringParameters: {
-                channel_id: process.env.TELEGRAM_TESTING_CHANNEL_ID!,
-                publish_url_field: 'testing'
-            },
             body: '{"key": "UNKNOWD-1"}'
         });
         const response = await handler(request);
@@ -60,10 +49,6 @@ describe('app', () => {
     it('should show error for issue with empty description', async () => {
         const request = getCloudFunctionRequest({
             headers: {'X-Tarmolov-Work-Secret-Key': config['app.secret']},
-            queryStringParameters: {
-                channel_id: process.env.TELEGRAM_TESTING_CHANNEL_ID!,
-                publish_url_field: 'testing'
-            },
             body: '{"key": "BLOGTEST-11"}'
         });
         const response = await handler(request);
@@ -83,10 +68,6 @@ describe('app', () => {
         it('should show error for issue with blocked deps', async () => {
             const request = getCloudFunctionRequest({
                 headers: {'X-Tarmolov-Work-Secret-Key': config['app.secret']},
-                queryStringParameters: {
-                    channel_id: process.env.TELEGRAM_TESTING_CHANNEL_ID!,
-                    publish_url_field: 'production'
-                },
                 body: '{"key": "BLOGTEST-18"}'
             });
             const response = await handler(request);
@@ -104,17 +85,13 @@ describe('app', () => {
             before(async () => {
                 await trackerProvider.editIssue(testCase.issue, {
                     description: Math.random().toString(),
-                    [`${config['tracker.fields.prefix']}testing`]: null
+                    [config['tracker.fields.publishUrl']]: null
                 });
             });
 
             it('should post to telegram', async () => {
                 const request = getCloudFunctionRequest({
                     headers: {'X-Tarmolov-Work-Secret-Key': config['app.secret']},
-                    queryStringParameters: {
-                        channel_id: process.env.TELEGRAM_TESTING_CHANNEL_ID!,
-                        publish_url_field: 'testing'
-                    },
                     body: `{"key": "${testCase.issue}"}`
                 });
                 const response = await handler(request);

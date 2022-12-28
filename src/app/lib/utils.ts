@@ -11,14 +11,14 @@ export function formatIssueDescription(issue: TrackerIssue, debug?: boolean) {
             .map((component) => `#${component.display}`)
             .join(' ');
 
-        description += `\n\n${components}`;
+        description += `\n \n${components}`;
     }
 
     if (debug) {
         description += [
             '\n\n⎯⎯⎯⎯⎯  ✄ ⎯⎯⎯⎯⎯',
             '**Служебная информация:**',
-            `* [Задача в трекере](https://tracker.yandex.ru/${issue.key})`,
+            `- [Задача в трекере](https://tracker.yandex.ru/${issue.key})`,
             getApproversByComponents(issue.components)
         ].join('\n');
     }
@@ -31,14 +31,14 @@ function getApproversByComponents(components: TrackerComponent[] = []) {
 
     components
         .forEach((component) => {
-            const componentApprovers = config['tracker.components.approvers'][component.display];
+            const componentApprovers = config['app.debug.components.approvers'][component.display];
             if (componentApprovers) {
                 approvers.push(...componentApprovers);
             }
         });
 
     return approvers.length ?
-        `* Получить \`ОК\` от ${approvers.join(', ')}` :
+        `- Получить \`ОК\` от ${approvers.join(', ')}` :
         '';
 }
 

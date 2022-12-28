@@ -2,7 +2,7 @@ import {marked} from 'marked';
 
 // escape probitited symbols
 // see https://core.telegram.org/bots/api#markdownv2-style
-const walkTokens = (token: marked.Token) => {
+const tokensEscaper = (token: marked.Token) => {
     // inside pre and code entities, all '`' and '\' characters must be escaped with a preceding '\' character.
     if (token.type === 'codespan' || token.type === 'code') {
         token.text = token.text.replace(/\\*(`|\\)/g, '\\$1');
@@ -28,9 +28,9 @@ const renderer: Partial<marked.Renderer> = {
     del: (text) => `~${text}~`,
     blockquote: (text) => `\\> ${text}`,
     link: (href, _, text) => `[${text}](${href})`,
-    list: (body, ordered) => '\n' + body
+    list: (body, ordered) => body
         .split('\n')
-        .slice(0, -1) // remove last end of line
+        .slice(0, -1) // remove end of line from the last list item
         .map((item, index) => ordered ? `${++index}\\. ${item}` : `\\- ${item}`)
         .join('\n') + '\n'
     ,
@@ -38,7 +38,7 @@ const renderer: Partial<marked.Renderer> = {
     br: () => '\n\n',
     codespan: (code) => `\`${code}\``,
     code: (code) => `\`\`\`\n${code}\n\`\`\`\n`,
-    paragraph: (text: string) => `${text}\n\n`
+    paragraph: (text: string) => `${text}\n`
 };
 
 // specific underline markup is missed in marked module
@@ -67,6 +67,30 @@ const underlinedExtension: marked.TokenizerExtension & marked.RendererExtension 
     }
 };
 
+const emptyLineExtension: marked.TokenizerExtension & marked.RendererExtension = {
+    name: 'empty-line',
+    level: 'block',
+    start(src: string) {
+        return src.match(/^\n/)?.index; // starts with \n\n
+    },
+    tokenizer(src) {
+        const match =  /^\n\n/.exec(src);
+
+        if (match) {
+            const text = match[1];
+            return {
+                type: 'empty-line',
+                raw: match[0],
+                text,
+                tokens: this.lexer.inlineTokens(text)
+            };
+        }
+    },
+    renderer(token) {
+        return `\n`;
+    }
+};
+
 // drop all images from markdown markup
 const dropImageExtension: marked.TokenizerExtension & marked.RendererExtension = {
     name: 'drop-image',
@@ -91,15 +115,28 @@ const dropImageExtension: marked.TokenizerExtension & marked.RendererExtension =
 };
 
 marked.use({
-    walkTokens,
     renderer,
     extensions: [
         underlinedExtension,
-        dropImageExtension
+        dropImageExtension,
+        emptyLineExtension
     ]
 });
 
+interface TranfromTelegramOptions {
+    linkExtractor?: (href: string) => string;
+}
+
 // transform Yandex Flavoured Markdown (YFM) to Telegram Markdown
-export function transformYfmToTelegramMarkdown(input: string) {
+export function transformYfmToTelegramMarkdown(input: string, options: TranfromTelegramOptions = {}) {
+    marked.use({
+        walkTokens: (token: marked.Token) => {
+            tokensEscaper(token);
+
+            if (options.linkExtractor && token.type === 'link') {
+                token.href = options.linkExtractor(token.href);
+            }
+        }
+    });
     return marked.parse(input).trim();
 }
