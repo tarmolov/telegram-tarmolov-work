@@ -60,20 +60,20 @@ const development: Config = {
     'tracker.fields.publishUrl': '635dac2e7129af41f3be0698--testing'
 };
 
-// const tests: Config = {
-//     ...testing,
-//     'app.debug': false,
-//     'app.debug.components.approvers': {
-//         'безопасность': ['@tarmolov'],
-//         'карты': ['@tarmolov']
-//     },
-// };
+const tests: Config = {
+    ...development,
+    'app.debug': false,
+    'app.debug.components.approvers': {
+        'безопасность': ['@tarmolov']
+    }
+};
 
 const configs = new Map<string, Config>([
     ['production', production],
     ['prestable', prestable],
     ['testing', testing],
-    ['development', development]
+    ['development', development],
+    ['tests', tests]
 ]);
 
 const APP_ENV = process.env.ENVIRONMENT || 'development';

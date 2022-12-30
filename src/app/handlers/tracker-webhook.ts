@@ -61,6 +61,7 @@ async function getTrackerIssueByKey(key: string) {
     return issue as TrackerIssue & {key: string};
 }
 
+const ISSUE_REGEXP = new RegExp(`^https://tracker.yandex.ru/(${config['tracker.queue']}-\\d+)`);
 export async function trackerWebhook(event: TrackerWebhookEvent) {
     const requestResult = RequestSchema.safeParse(event);
 
@@ -78,7 +79,20 @@ export async function trackerWebhook(event: TrackerWebhookEvent) {
     const bot = new TelegramProvider({channelId: config['telegram.channelId']});
     const publishUrlFieldKey = config['tracker.fields.publishUrl'];
     const messageId = TelegramProvider.getMessageIdFromUrl(issue[publishUrlFieldKey]?.toString());
-    const description = formatIssueDescription(issue, config['app.debug']);
+    const description = await formatIssueDescription(issue, {
+        debug: config['app.debug'],
+        linkExtractor: async (href: string) => {
+            const match = href.match(ISSUE_REGEXP);
+
+            if (match) {
+                const issue = await trackerProvider.getIssueByKey(match[1]);
+                const telegramPostLink = issue[publishUrlFieldKey];
+                return telegramPostLink ? telegramPostLink.toString(): '';
+            }
+
+            return href;
+        }
+    });
     const file = await trackerProvider.downloadFirstIssueAttachment(issue.key)
     const message = await bot.sendMessage(description, {messageId, file});
 

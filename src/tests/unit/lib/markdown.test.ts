@@ -33,9 +33,18 @@ describe('markdown', () => {
         };
 
         for (const [title, testData] of Object.entries(markdownExamples)) {
-            it(title, () => {
-                assert.equal(transformMarkdown(testData.input), testData.expected);
+            it(title, async () => {
+                assert.equal(await transformMarkdown(testData.input), testData.expected);
             });
         }
+    });
+
+    it('should replace links via links extractor', async () => {
+        const link = await transformMarkdown('[Ссылка](http://www.example.com/)', {
+            linkExtractor: async () => new Promise((resolve) => {
+                setTimeout(() => resolve('https://example.com/'), 0);
+            })
+        });
+        assert.equal(link, '[Ссылка](https://example\\.com/)');
     });
 });

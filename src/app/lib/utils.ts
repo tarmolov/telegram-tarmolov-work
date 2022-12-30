@@ -3,7 +3,12 @@ import {TrackerIssue, TrackerComponent} from '../providers/tracker.js';
 import {config} from '../config.js';
 import {transformYfmToTelegramMarkdown} from './markdown.js';
 
-export function formatIssueDescription(issue: TrackerIssue, debug?: boolean) {
+interface FormatIssueDescriptionOptions {
+    debug?: boolean;
+    linkExtractor?: (href: string) => Promise<string>
+}
+
+export function formatIssueDescription(issue: TrackerIssue, options: FormatIssueDescriptionOptions = {}) {
     let description = issue.description!; // eslint-disable-line @typescript-eslint/no-non-null-assertion
 
     if (issue.components) {
@@ -11,10 +16,10 @@ export function formatIssueDescription(issue: TrackerIssue, debug?: boolean) {
             .map((component) => `#${component.display}`)
             .join(' ');
 
-        description += `\n \n${components}`;
+        description += `\n\n${components}`;
     }
 
-    if (debug) {
+    if (options.debug) {
         description += [
             '\n\n⎯⎯⎯⎯⎯  ✄ ⎯⎯⎯⎯⎯',
             '**Служебная информация:**',
@@ -23,7 +28,9 @@ export function formatIssueDescription(issue: TrackerIssue, debug?: boolean) {
         ].join('\n');
     }
 
-    return transformYfmToTelegramMarkdown(description);
+    return transformYfmToTelegramMarkdown(description, {
+        linkExtractor: options.linkExtractor
+    });
 }
 
 function getApproversByComponents(components: TrackerComponent[] = []) {

@@ -67,6 +67,7 @@ const underlinedExtension: marked.TokenizerExtension & marked.RendererExtension 
     }
 };
 
+// keep empty lines in final markdown
 const emptyLineExtension: marked.TokenizerExtension & marked.RendererExtension = {
     name: 'empty-line',
     level: 'block',
@@ -86,7 +87,7 @@ const emptyLineExtension: marked.TokenizerExtension & marked.RendererExtension =
             };
         }
     },
-    renderer(token) {
+    renderer() {
         return `\n`;
     }
 };
@@ -120,23 +121,27 @@ marked.use({
         underlinedExtension,
         dropImageExtension,
         emptyLineExtension
-    ]
+    ],
+   async: true
 });
 
 interface TranfromTelegramOptions {
-    linkExtractor?: (href: string) => string;
+    linkExtractor?: (href: string) => Promise<string>;
 }
 
 // transform Yandex Flavoured Markdown (YFM) to Telegram Markdown
-export function transformYfmToTelegramMarkdown(input: string, options: TranfromTelegramOptions = {}) {
+export async function transformYfmToTelegramMarkdown(input: string, options: TranfromTelegramOptions = {}) {
     marked.use({
-        walkTokens: (token: marked.Token) => {
-            tokensEscaper(token);
-
+        walkTokens: async (token: marked.Token) => {
             if (options.linkExtractor && token.type === 'link') {
-                token.href = options.linkExtractor(token.href);
+                token.href = await options.linkExtractor(token.href);
             }
+            tokensEscaper(token);
         }
     });
-    return marked.parse(input).trim();
+
+    const result = (await marked.parse(input)).trim();
+    delete options.linkExtractor;
+
+    return result;
 }
