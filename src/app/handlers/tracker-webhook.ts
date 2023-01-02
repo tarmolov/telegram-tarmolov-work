@@ -103,7 +103,9 @@ export async function trackerWebhook(event: TrackerWebhookEvent) {
     });
 
     if (config['tracker.closeIssueAfterPublishing']) {
-        await trackerProvider.safeChangeIssueStatus(issue.key, 'closed');
+        await trackerProvider.safeChangeIssueStatus(issue.key, 'closed', {
+            resolution: 'fixed'
+        });
     }
 
     return formatCloudFunctionResponse({
