@@ -27,8 +27,8 @@ describe('markdown', () => {
                 expected: '_Курсив_\n*Полужирный*\n_Курсив_\n\\- один\n\\- два'
             },
             'Escape forbiden symbols': {
-                input: '> #Hel-lo!',
-                expected: '\\> \\#Hel\\-lo\\!'
+                input: '> #Hel-lo!"',
+                expected: '\\> \\#Hel\\-lo\\!"'
             }
         };
 

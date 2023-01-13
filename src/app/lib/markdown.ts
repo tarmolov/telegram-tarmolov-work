@@ -13,10 +13,17 @@ const tokensEscaper = (token: marked.Token) => {
         token.href = token.href.replace(/\\*(\.|#|\\|\))/g, '\\$1');
     }
 
-    // in all other places characters '_', '*', '[', ']', '(', ')', '~', '`', '>', '#', '+', '-', '=', '|', '{', '}', '.', '!'
-    // must be escaped with the preceding character '\'.
     if (token.type === 'text') {
-        token.text = token.text.replace(/\\*(_|\*|\[|\]|\(|\)|~|`|>|#|\+|-|=|\||{|}|\.|!)/g, '\\$1');
+        token.text = token.text
+            // default behaviour escapes symbols like ", ', <, >, &
+            .replace(/&quot;/g, '"')
+            .replace(/&amp;/g, '&')
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&#39;/g, '\'')
+            // in all other places characters '_', '*', '[', ']', '(', ')', '~', '`', '>', '#', '+', '-', '=', '|', '{', '}', '.', '!'
+            // must be escaped with the preceding character '\'.
+            .replace(/\\*(_|\*|\[|\]|\(|\)|~|`|>|#|\+|-|=|\||{|}|\.|!)/g, '\\$1');
     }
 };
 
