@@ -83,10 +83,13 @@ export async function trackerWebhook(event: TrackerWebhookEvent) {
         debug: config['app.debug'],
         linkExtractor: async (href: string) => {
             const match = href.match(ISSUE_REGEXP);
+            // don't replace link to the current issue
+            // it's usually used for debug
+            const issueKey = match && match[1] !== issue.key && match[1];
 
-            if (match) {
-                const issue = await trackerProvider.getIssueByKey(match[1]);
-                const telegramPostLink = issue[publishUrlFieldKey];
+            if (issueKey) {
+                const linkIssue = await trackerProvider.getIssueByKey(issueKey);
+                const telegramPostLink = linkIssue[publishUrlFieldKey];
                 return telegramPostLink ? telegramPostLink.toString(): '';
             }
 
