@@ -8,6 +8,10 @@ describe('utils', () => {
             const issue = {
                 key: 'BLOGTEST-1',
                 description: 'Test',
+                status: {
+                    key: 'testing',
+                    display: 'Тестируется'
+                },
                 components: [
                     {id: '1', display: 'байки'}
                 ]
@@ -20,6 +24,10 @@ describe('utils', () => {
             const issue = {
                 key: 'BLOGTEST-1',
                 description: 'Test',
+                status: {
+                    key: 'testing',
+                    display: 'Тестируется'
+                },
                 components: [
                     {id: '1', display: 'безопасность'}
                 ]

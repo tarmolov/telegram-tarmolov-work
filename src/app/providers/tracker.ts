@@ -13,6 +13,10 @@ interface TrackerIssueKnown {
     description?: string;
     createdAt?: string;
     updatedAt?: string;
+    status?:  {
+        key: string;
+        display: string;
+    };
     components?: TrackerComponent[];
 }
 interface TrackerIssueUnKnown {

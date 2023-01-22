@@ -24,6 +24,7 @@ export function formatIssueDescription(issue: TrackerIssue, options: FormatIssue
             '\n\n⎯⎯⎯⎯⎯  ✄ ⎯⎯⎯⎯⎯',
             '**Служебная информация:**',
             `- [Задача в трекере](https://tracker.yandex.ru/${issue.key})`,
+            `- Статус: \`${issue.status!.display}\``, // eslint-disable-line @typescript-eslint/no-non-null-assertion
             getApproversByComponents(issue.components)
         ].join('\n');
     }
