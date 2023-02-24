@@ -90,7 +90,9 @@ export async function trackerWebhook(event: TrackerWebhookEvent) {
             if (issueKey) {
                 const linkIssue = await trackerProvider.getIssueByKey(issueKey);
                 const telegramPostLink = linkIssue[publishUrlFieldKey];
-                return telegramPostLink ? telegramPostLink.toString(): '';
+                const newHref = telegramPostLink ? telegramPostLink.toString(): '';
+                logger.debug(`REPLACE LINK: "${href}" to "${newHref}"`);
+                return newHref;
             }
 
             return href;
