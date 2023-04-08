@@ -43,8 +43,8 @@ $ ./src/tests/manual/telegram.sh
 
 3. Invoke function
   ```
-  $ ./tools/make-request.sh
-  $ ./tools/make-request.sh '{"key": "BLOGTEST-4"}'
+  $ ./src/tools/make-request.sh
+  $ ./src/tools/make-request.sh '{"key": "BLOGTEST-4"}'
   ```
 
 ### Production

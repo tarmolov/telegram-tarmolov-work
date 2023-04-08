@@ -1,4 +1,8 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
+
+import * as dotenv from 'dotenv';
+dotenv.config();
+
 import * as assert from 'assert';
 
 export interface Config {
@@ -79,3 +83,4 @@ const configs = new Map<string, Config>([
 const APP_ENV = process.env.ENVIRONMENT || 'development';
 assert.ok(configs.has(APP_ENV), `There is no configuration for environment ${APP_ENV}`);
 export const config = configs.get(APP_ENV)!;
+export const getConfigByEnv = (env: string) => configs.get(env)!;

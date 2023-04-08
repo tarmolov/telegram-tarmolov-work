@@ -64,7 +64,7 @@ export class TrackerProvider {
     };
 
     private async _request(method: HttpMethod, path: string, data?: TrackerIssue) {
-        logger.debug(`TRACKER REQ: ${method.toLocaleUpperCase()} ${this._host}${path} {${data || ''}}`);
+        logger.debug(`TRACKER REQ: ${method.toLocaleUpperCase()} ${this._host}${path} {${JSON.stringify(data || '')}}`);
         const response = await got({
             method: method,
             url: `${this._host}${path}`,
@@ -74,6 +74,14 @@ export class TrackerProvider {
         });
         logger.debug(`TRACKER RES: ${JSON.stringify(response.body)}`);
         return response.body;
+    }
+
+    // https://cloud.yandex.ru/docs/tracker/concepts/issues/search-issues
+    async searchIssues(query: string) {
+        const data = {
+            query
+        };
+        return this._request('POST', '/v2/issues/_search?perPage=1000', data) as Promise<TrackerIssue[]>;
     }
 
     // https://cloud.yandex.ru/docs/tracker/concepts/issues/get-issue

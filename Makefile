@@ -8,7 +8,7 @@ deps:
 
 .PHONY: env
 env:
-	@./tools/generate-env-file.js
+	@./src/tools/generate-env-file.js
 
 .PHONY: build
 build:
@@ -72,6 +72,10 @@ deploy:
 	  --secret name=$(SECRET_ENV),key=TRACKER_ORG_ID,environment-variable=TRACKER_ORG_ID \
 	  --secret name=$(SECRET_ENV),key=ACCESS_SECRET_KEY,environment-variable=ACCESS_SECRET_KEY \
 	  --source-path $(OUT_DIR)/tarmolov_work.zip
+
+.PHONY: digest
+digest:
+	@NO_LOGGING=1 node ./out/tools/generate-digest.js
 
 .PHONY: clean
 clean:
