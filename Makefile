@@ -74,7 +74,7 @@ deploy:
 	  --source-path $(OUT_DIR)/tarmolov_work.zip
 
 .PHONY: digest
-digest:
+digest: build
 	@NO_LOGGING=1 node ./out/tools/generate-digest.js
 
 .PHONY: clean

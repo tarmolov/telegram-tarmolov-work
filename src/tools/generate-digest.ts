@@ -1,10 +1,14 @@
 #!/usr/bin/env node
 
-import {TrackerProvider} from '../app/providers/tracker.js';
+import {getConfigByEnv} from '../app/config.js';
+import {TrackerComponent, TrackerProvider} from '../app/providers/tracker.js';
 const trackerProvider = new TrackerProvider();
 
+const config = getConfigByEnv('production');
+const publishUrlFieldKey = config['tracker.fields.publishUrl'];
+
 async function generateDigest(from: string, to: string) {
-    const filterQuery = `Queue: BLOG Resolution: empty() Status: Открыт`;
+    const filterQuery = `Queue: BLOG Components: ! дайджесты Resolution: changed(to: Fixed date: ${from} .. ${to}) "Sort By": Created`;
     const issues = await trackerProvider.searchIssues(filterQuery);
     console.log(filterQuery);
     console.log(`Found ${issues.length}`);
@@ -17,7 +21,7 @@ async function generateDigest(from: string, to: string) {
                 result[component] = [];
             }
 
-            result[component].push(`${issue.summary}`);
+            result[component].push(`[${issue.summary}](${issue[publishUrlFieldKey]})`);
         });
 
         return result;
@@ -37,6 +41,7 @@ function capitalizeString(string: string) {
 }
 
 (async () => {
-    const digest = await generateDigest('07.09.2022', '31.12.2022')
-    console.log(digest)
+    // const digest = await generateDigest('07.09.2022', '31.12.2022');
+    const digest = await generateDigest('01.01.2023', '31.03.2023');
+    console.log(digest);
 })()
