@@ -38,7 +38,7 @@ const RequestSchema = z.object({
         return schema;
     });
 
-export type TrackerWebhookEvent = z.infer<typeof RequestSchema> & CloudFunctionRequest;
+export type TrackerHandlerEvent = z.infer<typeof RequestSchema> & CloudFunctionRequest;
 
 async function getTrackerIssueByKey(key: string) {
     const issue = await trackerProvider.getIssueByKey(key);
@@ -62,7 +62,7 @@ async function getTrackerIssueByKey(key: string) {
 }
 
 const ISSUE_REGEXP = new RegExp(`^https://tracker.yandex.ru/(${config['tracker.queue']}-\\d+)`);
-export async function trackerWebhook(event: TrackerWebhookEvent) {
+export async function trackerHandler(event: TrackerHandlerEvent) {
     const requestResult = RequestSchema.safeParse(event);
 
     if (!requestResult.success) {
