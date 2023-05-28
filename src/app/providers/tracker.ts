@@ -52,6 +52,7 @@ interface TrackerAttachment {
     content: string;
     createdAt?: string;
     updatedAt?: string;
+    commentId?: string;
 }
 
 const pipeline = promisify(stream.pipeline);
@@ -120,7 +121,8 @@ export class TrackerProvider {
 
     // https://cloud.yandex.ru/docs/tracker/concepts/issues/get-attachments-list
     async getIssueAttachments(key: string) {
-        return await this._request('GET', `/v2/issues/${key}/attachments`) as TrackerAttachment[];
+        const attachments = await this._request('GET', `/v2/issues/${key}/attachments`) as TrackerAttachment[];
+        return  attachments.filter((attachment) => !attachment.commentId);
     }
 
     // https://cloud.yandex.ru/docs/tracker/concepts/issues/get-attachment
