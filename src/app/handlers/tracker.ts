@@ -1,44 +1,11 @@
-import {z} from 'zod';
 import {config} from '../config.js';
 import {TelegramProvider} from '../providers/telegram.js'
-import {CloudFunctionRequest} from '../types.js';
 import {TrackerIssue, TrackerProvider} from '../providers/tracker.js';
 import {formatCloudFunctionResponse, formatIssueDescription} from '../lib/utils.js';
+import {TrackerEventPayload} from '../types.js';
 import {logger} from '../lib/logger.js';
 
 const trackerProvider = new TrackerProvider();
-
-const RequestSchema = z.object({
-    headers: z.object({
-        'X-Tarmolov-Work-Secret-Key': z.string()
-            .refine((secret) => secret === config['app.secret'], {message: 'Access denied'})
-    }),
-    isBase64Encoded: z.boolean().optional(),
-    body: z.string()
-})
-    .transform((schema, ctx) => {
-        schema.body = schema.isBase64Encoded ? Buffer.from(schema.body, 'base64').toString() : schema.body;
-
-        const body = JSON.parse(schema.body);
-        if (!body.key) {
-            ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                path: ['body'],
-                message: 'No issue key is passed',
-              });
-        }
-        if (!body.key?.startsWith(`${config['tracker.queue']}-`)) {
-            ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                path: ['body', 'key'],
-                message: `Issue doesn't belong to ${config['tracker.queue']}`,
-              });
-        }
-
-        return schema;
-    });
-
-export type TrackerHandlerEvent = z.infer<typeof RequestSchema> & CloudFunctionRequest;
 
 async function getTrackerIssueByKey(key: string) {
     const issue = await trackerProvider.getIssueByKey(key);
@@ -62,18 +29,7 @@ async function getTrackerIssueByKey(key: string) {
 }
 
 const ISSUE_REGEXP = new RegExp(`^https://tracker.yandex.ru/(${config['tracker.queue']}-\\d+)`);
-export async function trackerHandler(event: TrackerHandlerEvent) {
-    const requestResult = RequestSchema.safeParse(event);
-
-    if (!requestResult.success) {
-        const message = requestResult.error.issues
-            .map((issue) => `Error with parameter "${issue.path.join('/')}": ${issue.message}`)
-            .join('; ');
-        throw new Error(message);
-    }
-    const request = requestResult.data;
-    const payload = JSON.parse(request.body);
-    logger.debug(`PAYLOAD: ${JSON.stringify(payload)}`);
+export async function trackerHandler(payload: TrackerEventPayload) {
     const issue = await getTrackerIssueByKey(payload.key);
 
     const bot = new TelegramProvider({channelId: config['telegram.channelId']});

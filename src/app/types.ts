@@ -17,3 +17,7 @@ export interface CloudFunctionResponse {
     body: unknown;
     isBase64Encoded?: boolean;
 }
+
+export interface TrackerEventPayload {
+    key: string;
+};
