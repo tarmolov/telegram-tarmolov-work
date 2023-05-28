@@ -5,6 +5,7 @@
   "repository": "https://github.com/tarmolov/telegram-tarmolov-work",
   "dependencies": {
     "dotenv": "16.0.3",
+    "googleapis": "118.0.0",
     "got": "11.8.5",
     "marked": "4.2.5",
     "node-telegram-bot-api": "0.59.0",

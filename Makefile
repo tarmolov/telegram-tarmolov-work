@@ -8,7 +8,7 @@ deps:
 
 .PHONY: env
 env:
-	@./src/tools/generate-env-file.js
+	@./src/tools/generate-env-file.cjs
 
 .PHONY: build
 build:
@@ -71,6 +71,7 @@ deploy:
 	  --secret name=$(SECRET_ENV),key=TRACKER_OAUTH_TOKEN,environment-variable=TRACKER_OAUTH_TOKEN \
 	  --secret name=$(SECRET_ENV),key=TRACKER_ORG_ID,environment-variable=TRACKER_ORG_ID \
 	  --secret name=$(SECRET_ENV),key=ACCESS_SECRET_KEY,environment-variable=ACCESS_SECRET_KEY \
+	  --secret name=$(SECRET_ENV),key=GOOGLE_API_KEY_FILE,environment-variable=GOOGLE_API_KEY_FILE \
 	  --source-path $(OUT_DIR)/tarmolov_work.zip
 
 .PHONY: digest

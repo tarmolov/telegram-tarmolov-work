@@ -19,6 +19,8 @@ export interface Config {
     readonly 'tracker.checkIssueDeps': boolean;
     readonly 'telegram.botToken': string;
     readonly 'telegram.channelId': string;
+    readonly 'calendar.calendarEventsId': string;
+    readonly 'google.keyFile': string;
 }
 
 const production: Config = {
@@ -34,7 +36,9 @@ const production: Config = {
     'tracker.closeIssueAfterPublishing': true,
     'tracker.checkIssueDeps': true,
     'telegram.botToken': process.env.TELEGRAM_BOT_TOKEN!,
-    'telegram.channelId': '-1001697479693'
+    'telegram.channelId': '-1001697479693',
+    'calendar.calendarEventsId': 'edfff3aba29c48354928835efca2b2c4dc91f68de6b2156668254958f1d06098@group.calendar.google.com',
+    'google.keyFile': process.env.GOOGLE_API_KEY_FILE!
 };
 
 const prestable: Config = {
@@ -52,7 +56,8 @@ const testing: Config = {
     'telegram.channelId': '-1001667901649',
     'tracker.queue': 'BLOGTEST',
     'tracker.fields.publishUrl': '635dac2e7129af41f3be0698--production',
-    'tracker.fields.publisDateTime': '635dac2e7129af41f3be0698--publishDateTime'
+    'tracker.fields.publisDateTime': '635dac2e7129af41f3be0698--publishDateTime',
+    'calendar.calendarEventsId': '94e888b714ca495fcd34c3426bc58d2b18b115bfeb640ab8ceb8298faaed522c@group.calendar.google.com'
 };
 
 const development: Config = {
