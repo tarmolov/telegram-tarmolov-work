@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import {getConfigByEnv} from '../app/config.js';
-import {TrackerComponent, TrackerProvider} from '../app/providers/tracker.js';
+import {TrackerProvider} from '../app/providers/tracker.js';
 const trackerProvider = new TrackerProvider();
 
 const config = getConfigByEnv('production');
