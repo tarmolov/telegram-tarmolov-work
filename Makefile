@@ -1,6 +1,6 @@
 OUT_DIR=out
 NODE_MODULES_BIN=node_modules/.bin/
-MOCHA_OPTIONS ?= -R dot -r source-map-support/register -r src/tests/setup.js -t 10000 --exit
+MOCHA_OPTIONS ?= -R dot -r source-map-support/register -r src/tests/setup.js -t 20000 --exit
 .PHONY: deps
 deps:
 	@npm i

@@ -28,7 +28,7 @@ async function getTrackerIssueByKey(key: string) {
     return issue as TrackerIssue & {key: string};
 }
 
-const ISSUE_REGEXP = new RegExp(`^https://tracker.yandex.ru/(${config['tracker.queue']}-\\d+)`);
+const ISSUE_REGEXP = new RegExp(`^${config['tracker.url']}(${config['tracker.queue']}-\\d+)`);
 export async function trackerHandler(payload: TrackerEventPayload) {
     const issue = await getTrackerIssueByKey(payload.key);
 

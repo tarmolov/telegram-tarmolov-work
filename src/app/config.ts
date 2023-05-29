@@ -9,12 +9,15 @@ export interface Config {
     readonly 'app.secret': string;
     readonly 'app.debug': boolean;
     readonly 'app.debug.components.approvers': Record<string, string[]>;
-    readonly 'tracker.host': string;
+    readonly 'tracker.apiUrl': string;
     readonly 'tracker.oauthToken': string;
     readonly 'tracker.orgId': string;
     readonly 'tracker.queue': string;
+    readonly 'tracker.url': string;
     readonly 'tracker.fields.publishUrl': string;
     readonly 'tracker.fields.publisDateTime': string;
+    readonly 'tracker.fields.scheduledDateTime': string;
+    readonly 'tracker.fields.calendarEventId': string;
     readonly 'tracker.closeIssueAfterPublishing': boolean;
     readonly 'tracker.checkIssueDeps': boolean;
     readonly 'telegram.botToken': string;
@@ -27,12 +30,15 @@ const production: Config = {
     'app.secret': process.env.ACCESS_SECRET_KEY!,
     'app.debug.components.approvers': {},
     'app.debug': false,
-    'tracker.host': 'https://api.tracker.yandex.net',
+    'tracker.apiUrl': 'https://api.tracker.yandex.net',
     'tracker.oauthToken': process.env.TRACKER_OAUTH_TOKEN!,
     'tracker.orgId': process.env.TRACKER_ORG_ID!,
     'tracker.queue': 'BLOG',
+    'tracker.url': 'https://tracker.yandex.ru/',
     'tracker.fields.publishUrl': '635bb3a32bf1dd5fdb87553e--production',
     'tracker.fields.publisDateTime': '635bb3a32bf1dd5fdb87553e--publishDateTime',
+    'tracker.fields.scheduledDateTime': '635bb3a32bf1dd5fdb87553e--scheduledDateTime',
+    'tracker.fields.calendarEventId': '635bb3a32bf1dd5fdb87553e--calendarEventId',
     'tracker.closeIssueAfterPublishing': true,
     'tracker.checkIssueDeps': true,
     'telegram.botToken': process.env.TELEGRAM_BOT_TOKEN!,
@@ -57,6 +63,8 @@ const testing: Config = {
     'tracker.queue': 'BLOGTEST',
     'tracker.fields.publishUrl': '635dac2e7129af41f3be0698--production',
     'tracker.fields.publisDateTime': '635dac2e7129af41f3be0698--publishDateTime',
+    'tracker.fields.scheduledDateTime': '635dac2e7129af41f3be0698--scheduledDateTime',
+    'tracker.fields.calendarEventId': '635dac2e7129af41f3be0698--calendarEventId',
     'calendar.calendarEventsId': '94e888b714ca495fcd34c3426bc58d2b18b115bfeb640ab8ceb8298faaed522c@group.calendar.google.com'
 };
 

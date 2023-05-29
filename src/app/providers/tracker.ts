@@ -58,7 +58,7 @@ interface TrackerAttachment {
 const pipeline = promisify(stream.pipeline);
 
 export class TrackerProvider {
-    private readonly _host = config['tracker.host'];
+    private readonly _host = config['tracker.apiUrl'];
     private readonly _defaultHeaders = {
         Authorization: `OAuth ${config['tracker.oauthToken']}`,
         'X-Org-ID': config['tracker.orgId']

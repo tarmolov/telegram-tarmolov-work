@@ -2,6 +2,8 @@ import {config} from '../config.js';
 import {logger} from '../lib/logger.js';
 import {google, Auth, calendar_v3 as Calendar} from 'googleapis';
 
+export type CalendarEvent = Calendar.Schema$Event;
+
 export class CalendarProvider {
     private readonly _calendar;
     private readonly _calendarId = config['calendar.calendarEventsId'];

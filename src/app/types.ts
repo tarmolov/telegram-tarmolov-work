@@ -20,4 +20,4 @@ export interface CloudFunctionResponse {
 
 export interface TrackerEventPayload {
     key: string;
-};
+}

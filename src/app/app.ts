@@ -2,14 +2,15 @@ import * as dotenv from 'dotenv'
 dotenv.config()
 import {z} from 'zod';
 import {config} from './config.js';
-import {trackerHandler} from './handlers/tracker.js';
 import {CloudFunctionRequest, TrackerEventPayload} from './types.js';
+import {trackerHandler} from './handlers/tracker.js';
+import {calendarHandler} from './handlers/calendar.js';
 import {formatCloudFunctionResponse} from './lib/utils.js';
 import {logger} from './lib/logger.js';
 
 const RequestSchema = z.object({
     headers: z.object({
-        'X-Tarmolov-Work-Event': z.enum(['BLOG_POST', 'CALENDAR']),
+        'X-Tarmolov-Work-Event': z.enum(['BLOG_POST', 'CALENDAR_EVENT']),
         'X-Tarmolov-Work-Secret-Key': z.string()
             .refine((secret) => secret === config['app.secret'], {message: 'Access denied'})
     }),
@@ -61,10 +62,14 @@ export async function handler(event: CloudFunctionRequest) {
         const payload = JSON.parse(request.body) as TrackerEventPayload;
         logger.debug(`PAYLOAD: ${JSON.stringify(payload)}`);
 
-        const eventName = event.headers['X-TARMOLOV-WORK-EVENT'];
+        const eventName = event.headers['X-Tarmolov-Work-Event'];
         switch (eventName) {
             case 'BLOG_POST':
                 handlerResponse = await trackerHandler(payload);
+                break;
+
+            case 'CALENDAR_EVENT':
+                handlerResponse = await calendarHandler(payload);
                 break;
 
             default:
