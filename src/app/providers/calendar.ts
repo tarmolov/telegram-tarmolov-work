@@ -5,7 +5,7 @@ import {google, Auth, calendar_v3 as Calendar} from 'googleapis';
 export type CalendarEvent = Calendar.Schema$Event;
 
 export class CalendarProvider {
-    private readonly _calendar;
+    private readonly _calendar: Calendar.Calendar;
     private readonly _calendarId = config['calendar.calendarEventsId'];
 
     constructor() {

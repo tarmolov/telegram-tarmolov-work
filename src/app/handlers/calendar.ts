@@ -24,7 +24,6 @@ export async function calendarHandler(payload: TrackerEventPayload) {
     const date = new Date(dateString as string || Date.now());
 
     // tracker runs schedulers only hourly; so make period in 1 hour for every event
-    date.setHours(0);
     date.setMinutes(0);
     date.setSeconds(0);
     const startDateString = toISOStringWithTimezone(date);
@@ -43,7 +42,6 @@ export async function calendarHandler(payload: TrackerEventPayload) {
             'timeZone': 'Europe/Moscow',
         }
     };
-
 
     if (!calendarEventId) {
         const response = await calendarProvider.addEvent(event);
