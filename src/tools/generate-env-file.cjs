@@ -3,7 +3,8 @@
 
 const fs = require('fs');
 const execSync = require('child_process').execSync;
-const secret = shell('yc lockbox secret get testing --format json');
+const env = process.env.ENVIRONMENT || 'testing';
+const secret = shell(`yc lockbox secret get ${env} --format json`);
 const version = shell(`yc lockbox payload get ${secret.current_version.secret_id} --format json`);
 const envFileContent = version.entries
     .map(({key, text_value, binary_value}) => `${key}="${text_value || binary_value}"`)
