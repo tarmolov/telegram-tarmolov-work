@@ -28,61 +28,49 @@ export interface Config {
 
 const production: Config = {
     'app.secret': process.env.ACCESS_SECRET_KEY!,
-    'app.debug.components.approvers': {},
     'app.debug': false,
     'tracker.apiUrl': 'https://api.tracker.yandex.net',
     'tracker.oauthToken': process.env.TRACKER_OAUTH_TOKEN!,
     'tracker.orgId': process.env.TRACKER_ORG_ID!,
-    'tracker.queue': 'BLOG',
+    'tracker.queue': process.env.TRACKER_QUEUE!,
     'tracker.url': 'https://tracker.yandex.ru/',
-    'tracker.fields.publishUrl': '635bb3a32bf1dd5fdb87553e--production',
-    'tracker.fields.publisDateTime': '635bb3a32bf1dd5fdb87553e--publishDateTime',
-    'tracker.fields.scheduledDateTime': '635bb3a32bf1dd5fdb87553e--scheduledDateTime',
-    'tracker.fields.calendarEventId': '635bb3a32bf1dd5fdb87553e--calendarEventId',
+    'tracker.fields.publishUrl': `${process.env.TRACKER_QUEUE_LOCAL_FIELD_HASH!}--production`,
+    'tracker.fields.publisDateTime': `${process.env.TRACKER_QUEUE_LOCAL_FIELD_HASH!}--publishDateTime`,
+    'tracker.fields.scheduledDateTime': `${process.env.TRACKER_QUEUE_LOCAL_FIELD_HASH!}--scheduledDateTime`,
+    'tracker.fields.calendarEventId': `${process.env.TRACKER_QUEUE_LOCAL_FIELD_HASH!}--calendarEventId`,
     'tracker.closeIssueAfterPublishing': true,
     'tracker.checkIssueDeps': true,
     'telegram.botToken': process.env.TELEGRAM_BOT_TOKEN!,
-    'telegram.channelId': '-1001697479693',
-    'calendar.calendarEventsId': 'edfff3aba29c48354928835efca2b2c4dc91f68de6b2156668254958f1d06098@group.calendar.google.com',
-    'google.keyFile': process.env.GOOGLE_API_KEY_FILE!
+    'telegram.channelId': process.env.TELEGRAM_PRODUCTION_CHANNEL_ID!,
+    'calendar.calendarEventsId': process.env.CALENDAR_ID!,
+    'google.keyFile': process.env.GOOGLE_API_KEY_FILE!,
+    'app.debug.components.approvers': JSON.parse(Buffer.from(process.env.TRACKER_COMPONENTS_APPROVERS!, 'base64').toString())
 };
 
 const prestable: Config = {
     ...production,
-    'telegram.channelId': '-1001649625656',
-    'tracker.fields.publishUrl': '635bb3a32bf1dd5fdb87553e--testing',
+    'telegram.channelId': process.env.TELEGRAM_TESTING_CHANNEL_ID!,
+    'tracker.fields.publishUrl': `${process.env.TRACKER_QUEUE_LOCAL_FIELD_HASH!}--testing`,
     'tracker.closeIssueAfterPublishing': false,
     'tracker.checkIssueDeps': false,
-    'app.debug': true,
-    'app.debug.components.approvers': {}
+    'app.debug': true
 };
 
 const testing: Config = {
-    ...production,
-    'telegram.channelId': '-1001667901649',
-    'tracker.queue': 'BLOGTEST',
-    'tracker.fields.publishUrl': '635dac2e7129af41f3be0698--production',
-    'tracker.fields.publisDateTime': '635dac2e7129af41f3be0698--publishDateTime',
-    'tracker.fields.scheduledDateTime': '635dac2e7129af41f3be0698--scheduledDateTime',
-    'tracker.fields.calendarEventId': '635dac2e7129af41f3be0698--calendarEventId',
-    'calendar.calendarEventsId': '94e888b714ca495fcd34c3426bc58d2b18b115bfeb640ab8ceb8298faaed522c@group.calendar.google.com'
+    ...production
 };
 
 const development: Config = {
     ...testing,
     'app.debug': true,
-    'app.debug.components.approvers': {},
-    'telegram.channelId': '-1001671230891',
+    'telegram.channelId': process.env.TELEGRAM_TESTING_CHANNEL_ID!,
     'tracker.closeIssueAfterPublishing': false,
-    'tracker.fields.publishUrl': '635dac2e7129af41f3be0698--testing'
+    'tracker.fields.publishUrl': `${process.env.TRACKER_QUEUE_LOCAL_FIELD_HASH!}--testing`
 };
 
 const tests: Config = {
     ...development,
-    'app.debug': false,
-    'app.debug.components.approvers': {
-        'безопасность': ['@tarmolov']
-    }
+    'app.debug': false
 };
 
 const configs = new Map<string, Config>([

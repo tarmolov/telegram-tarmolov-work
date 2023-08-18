@@ -72,6 +72,11 @@ deploy:
 	  --secret name=$(SECRET_ENV),key=TRACKER_ORG_ID,environment-variable=TRACKER_ORG_ID \
 	  --secret name=$(SECRET_ENV),key=ACCESS_SECRET_KEY,environment-variable=ACCESS_SECRET_KEY \
 	  --secret name=$(SECRET_ENV),key=GOOGLE_API_KEY_FILE,environment-variable=GOOGLE_API_KEY_FILE \
+	  --secret name=$(SECRET_ENV),key=TRACKER_QUEUE,environment-variable=TRACKER_QUEUE \
+	  --secret name=$(SECRET_ENV),key=TRACKER_QUEUE_LOCAL_FIELD_HASH,environment-variable=TRACKER_QUEUE_LOCAL_FIELD_HASH \
+	  --secret name=$(SECRET_ENV),key=CALENDAR_ID,environment-variable=CALENDAR_ID \
+	  --secret name=$(SECRET_ENV),key=TELEGRAM_PRODUCTION_CHANNEL_ID,environment-variable=TELEGRAM_PRODUCTION_CHANNEL_ID \
+	  --secret name=$(SECRET_ENV),key=TELEGRAM_TESTING_CHANNEL_ID,environment-variable=TELEGRAM_TESTING_CHANNEL_ID \
 	  --source-path $(OUT_DIR)/tarmolov_work.zip
 
 .PHONY: digest
