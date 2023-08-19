@@ -1,6 +1,8 @@
 OUT_DIR=out
 NODE_MODULES_BIN=node_modules/.bin/
 MOCHA_OPTIONS ?= -R dot -r source-map-support/register -r src/tests/setup.js -t 20000 --exit
+SERVICE_ACCOUNT_ID=$(shell yc iam service-account get --name telegram-tarmolov-work | awk '$1 ~ /^id:/ {print $2}')
+
 .PHONY: deps
 deps:
 	@npm i
@@ -60,7 +62,7 @@ deploy:
 	@echo
 	@echo Deploying $(ENV)...
 	yc serverless function version create \
-	  --service-account-id ajefocfisp51nn3k11pb \
+	  --service-account-id $(SERVICE_ACCOUNT_ID) \
 	  --function-name=$(ENV) \
 	  --runtime nodejs16 \
 	  --entrypoint out/app/app.handler \

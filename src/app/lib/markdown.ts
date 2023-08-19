@@ -95,8 +95,7 @@ const emptyLineExtension: marked.TokenizerExtension & marked.RendererExtension =
         }
     },
     renderer() {
-        return `\n`;
-    }
+        return `\n`; }
 };
 
 // drop all images from markdown markup

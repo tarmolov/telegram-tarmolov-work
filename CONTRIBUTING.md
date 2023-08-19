@@ -1,10 +1,8 @@
 # Contributing
 
 ## Requirements
-The project is build on [Node.js](http://nodejs.org/) application engine and uses [npm](http://npmjs.org) for tracking dependencies.
-
-Extra dependencies which are need for development issues:
-  * [Yandec Cloud CLI](https://cloud.yandex.ru/docs/cli/quickstart#install)
+* [Node.js](http://nodejs.org/)
+* [Yandec Cloud CLI](https://cloud.yandex.ru/docs/cli/quickstart#install)
 
 ## Getting Started
 
