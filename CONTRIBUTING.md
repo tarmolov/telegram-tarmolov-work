@@ -3,38 +3,38 @@
 ## Prerequisites
 ### Telegram
 1. [Create telegram bots](https://core.telegram.org/bots/tutorial):
-  * for production
-  * for testing (optional)
+    * for production
+    * for testing (optional)
 2. Save token for bots.
 3. Create telegrams channels:
-  * for production
-  * for testing (optional)
+    * for production
+    * for testing (optional)
 4. Add bots to the channels.and make them as `Administrators`.
 5. Save channel id.
-  * open created channel at https://web.telegram.org/
-  * you see the url like this https://web.telegram.org/a/#-123456789
-  * replace `-` to `-100` and you get `-100123456789`
+    * open created channel at https://web.telegram.org/
+    * you see the url like this https://web.telegram.org/a/#-123456789
+    * replace `-` to `-100` and you get `-100123456789`
 6. Save channel ids.
 
 ### Google calendar
 1. [Create calendars and service accounts](https://habr.com/ru/articles/524240/):
-  * for production
-  * for testing (optional)
+    * for production
+    * for testing (optional)
 2. Save calendar id and service account credentials.
 
 ### Yandex Cloud
 1. [Create cloud](https://cloud.yandex.ru/docs/resource-manager/operations/cloud/create) with name `telegram-tarmolov-work`.
 2. [Create service account](https://cloud.yandex.ru/docs/iam/operations/sa/create) with name `telegram-tarmolov-work` with two roles:
-  * `serverless.functions.invoker`
-  * `lockbox.payloadViewer`
+    * `serverless.functions.invoker`
+    * `lockbox.payloadViewer`
 3. [Create serverless functions](https://cloud.yandex.ru/docs/functions/operations/function/function-create):
-  * `production`
-  * `prestable`
-  * `testing` (optional)
-  * `development` (optional)
+    * `production`
+    * `prestable`
+    * `testing` (optional)
+    * `development` (optional)
 4. [Create secrets](https://cloud.yandex.ru/docs/lockbox/operations/secret-create) in Lockbox:
-  * `production`
-  * `testing` (optional)
+    * `production`
+    * `testing` (optional)
 5. [Install Yandex Cloud CLI](https://cloud.yandex.ru/docs/cli/quickstart#install)
 
 ### Yandex Tracker
