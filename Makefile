@@ -83,7 +83,9 @@ deploy:
 
 .PHONY: digest
 digest: build
+	@ENVIRONMENT=production make env
 	@NO_LOGGING=1 node ./out/tools/generate-digest.js
+	@make env
 
 .PHONY: clean
 clean:
