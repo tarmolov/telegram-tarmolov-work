@@ -8,7 +8,7 @@ describe('markdown', () => {
             'Italic': {input: '*Курсив*', expected: '_Курсив_'},
             'Underlined': {input: '++Подчеркнутый++', expected: '__Подчеркнутый__'},
             'Strikethrough': {input: '~~Перечеркнутый~~', expected: '~Перечеркнутый~'},
-            'Quote': {input: '> Цитата', expected: '\\>Цитата'},
+            'Quote': {input: '> Цитата', expected: '>Цитата'},
             'Link': {input: '[Ссылка](http://www.example.com/)', expected: '[Ссылка](http://www\\.example\\.com/)'},
             'Unordered list': {
                 input: '* один\n* два\n* три\n* четыре\n* пять',
@@ -28,7 +28,7 @@ describe('markdown', () => {
             },
             'Escape forbiden symbols': {
                 input: '> #Hel-lo!"',
-                expected: '\\>\\#Hel\\-lo\\!"'
+                expected: '>\\#Hel\\-lo\\!"'
             }
         };
 

@@ -1,7 +1,7 @@
 OUT_DIR=out
 NODE_MODULES_BIN=node_modules/.bin/
 MOCHA_OPTIONS ?= -R dot -r source-map-support/register -r src/tests/setup.js -t 20000 --exit
-SERVICE_ACCOUNT_ID=$(shell yc iam service-account get --name telegram-tarmolov-work | awk '$1 ~ /^id:/ {print $2}')
+SERVICE_ACCOUNT_ID=$(shell yc iam service-account get --name telegram-tarmolov-work | grep -e "^id:" | sed "s/id: //")
 
 .PHONY: deps
 deps:
@@ -79,6 +79,7 @@ deploy:
 	  --secret name=$(SECRET_ENV),key=CALENDAR_ID,environment-variable=CALENDAR_ID \
 	  --secret name=$(SECRET_ENV),key=TELEGRAM_PRODUCTION_CHANNEL_ID,environment-variable=TELEGRAM_PRODUCTION_CHANNEL_ID \
 	  --secret name=$(SECRET_ENV),key=TELEGRAM_TESTING_CHANNEL_ID,environment-variable=TELEGRAM_TESTING_CHANNEL_ID \
+	  --secret name=$(SECRET_ENV),key=TRACKER_COMPONENTS_APPROVERS,environment-variable=TRACKER_COMPONENTS_APPROVERS \
 	  --source-path $(OUT_DIR)/tarmolov_work.zip
 
 .PHONY: digest

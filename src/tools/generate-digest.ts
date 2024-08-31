@@ -44,6 +44,8 @@ function capitalizeString(string: string) {
     // const digest = await generateDigest('07.09.2022', '31.12.2022');
     // const digest = await generateDigest('01.01.2023', '31.03.2023');
     // const digest = await generateDigest('01.04.2023', '30.06.2023');
-    const digest = await generateDigest('01.07.2023', '31.12.2023');
+    // const digest = await generateDigest('01.07.2023', '31.12.2023');
+    // const digest = await generateDigest('01.01.2024', '31.03.2024');
+    const digest = await generateDigest('01.04.2024', '30.06.2024');
     console.log(digest);
 })()

@@ -33,7 +33,7 @@ const renderer: Partial<marked.Renderer> = {
     strong: (text) => `*${text}*`,
     em: (text) => `_${text}_`,
     del: (text) => `~${text}~`,
-    blockquote: (text) => `\\>${text}`,
+    blockquote: (text) => `>${text}`,
     link: (href, _, text) => `[${text}](${href})`,
     list: (body, ordered) => body
         .split('\n')
