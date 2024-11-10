@@ -16,7 +16,7 @@ describe('markdown', () => {
             },
             'Ordered list': {input: '1. один\n2. два', expected: '1\\. один\n2\\. два'},
             'Image': {
-                input: '![image.png](/ajax/v2/attachments/14?inline=true =x400)  \n   тест ![image.png](/ajax/v2/attachments/14?inline=true =x400)',
+                input: '![](/ajax/v2/attachments/14?inline=true =x400)\n   тест ![image.png](/ajax/v2/attachments/14?inline=true =x400)',
                 expected: 'тест'
             },
             'Code inline': {input: '`inline code`', expected: '`inline code`'},

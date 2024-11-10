@@ -106,7 +106,7 @@ const dropImageExtension: marked.TokenizerExtension & marked.RendererExtension =
         return src.match(/!\[/)?.index; // starts with ![...]
     },
     tokenizer(src) {
-        const match =  /^!\[[^\]]+\]\([^)]+\)/.exec(src); // ![...](...)
+        const match =  /^!\[[^\]]*\]\([^)]+\)/.exec(src); // ![...](...)
 
         if (match) {
             const text = match[0];
